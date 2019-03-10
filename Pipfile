@@ -1,0 +1,23 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[packages]
+aiocache = "==0.10.1"
+motor = "==2.0"
+pyaml = "==18.11.0"
+quart = "==0.8.1"
+quart-cors = "==0.1.2"
+scipy = "==1.2.1"
+stop-words = "==2018.7.23"
+ujson = "==1.35"
+uvloop = "==0.12.1"
+
+[dev-packages]
+"flake8" = "==3.7.7"
+"flake8-quotes" = "==1.0.0"
+locustio = "==0.9"
+
+[requires]
+python_version = "3.7"
