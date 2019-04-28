@@ -5,10 +5,10 @@ verify_ssl = true
 
 [packages]
 aiocache = "==0.10.1"
-fastapi = "==0.19.0"
+fastapi = "==0.20.0"
 motor = "==2.0"
 parse-accept-language = "==0.1.2"
-pyaml = "==18.11.0"
+pyaml = "==19.4.1"
 scipy = "==1.2.1"
 sentry-asgi = "==0.1.5"
 sentry-sdk = "==0.7.12"
@@ -18,8 +18,8 @@ uvicorn = "==0.7.0"
 
 [dev-packages]
 "flake8" = "==3.7.7"
-"flake8-quotes" = "==1.0.0"
-locustio = "==0.9"
+"flake8-quotes" = "==2.0.1"
+locustio = "*"
 
 [requires]
 python_version = "3.7"

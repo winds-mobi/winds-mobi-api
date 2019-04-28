@@ -12,8 +12,8 @@ winds-mobi-api
 
 Python 3.7 standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
 
-API documentation:
-- OpenAPI
+OpenAPI documentation:
+- /docs
 
 ### Requirements
 
@@ -23,12 +23,13 @@ Mandatory requirements:
 
 See [settings.py](https://github.com/winds-mobi/winds-mobi-providers/blob/master/settings.py)
 
-### How to build
+### Install dependencies
 
 - `pipenv install`
 
 ### Run the server
 
+- `pipenv shell`
 - `uvicorn app:app`
 
 Licensing

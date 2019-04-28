@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "38373e51474d34b7dba6c3ff1e0692ee44095cf1ef452bb67adbdd206f3840f7"
+            "sha256": "a7c117650a85c99ce628e32aa9250eaabd70f857db396bdbbcbbd4a54d165756"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -40,11 +40,11 @@
         },
         "fastapi": {
             "hashes": [
-                "sha256:1ef840b059375282cac68540e859d7159da9c1885b65aecd11a6c967d44e984c",
-                "sha256:3b1731a2b44998334322753fa78491f0af262d3989c715ecda3b102e57f07f9d"
+                "sha256:1f886e96e4bf81d6b9f90b7477c8c661a84fb0a3c1313c339b0203f7c21e908f",
+                "sha256:889ba0e46d23e7a396075ceff146088365ace80f225f335562a9101e7015345d"
             ],
             "index": "pypi",
-            "version": "==0.19.0"
+            "version": "==0.20.0"
         },
         "h11": {
             "hashes": [
@@ -105,11 +105,11 @@
         },
         "pyaml": {
             "hashes": [
-                "sha256:39470e99cfb7a0ef79e593fee626328283cd6d1a9c23c7e30f0d3a6933f3a235",
-                "sha256:b96292cc409e0f222b6fecff96afd2e19cfab5d1f2606344907751d42301263a"
+                "sha256:a2dcbc4a8bb00b541efd1c5a064d93474d4f41ded1484fbb08bec9d236523931",
+                "sha256:c79ae98ececda136a034115ca178ee8bf3aa7df236c488c2f55d12f177b88f1e"
             ],
             "index": "pypi",
-            "version": "==18.11.0"
+            "version": "==19.4.1"
         },
         "pydantic": {
             "hashes": [
@@ -331,10 +331,10 @@
         },
         "flake8-quotes": {
             "hashes": [
-                "sha256:fd9127ad8bbcf3b546fa7871a5266fd8623ce765ebe3d5aa5eabb80c01212b26"
+                "sha256:10c9af6b472d4302a8e721c5260856c3f985c5c082b04841aefd2f808ac02038"
             ],
             "index": "pypi",
-            "version": "==1.0.0"
+            "version": "==2.0.1"
         },
         "flask": {
             "hashes": [
@@ -419,11 +419,11 @@
         },
         "locustio": {
             "hashes": [
-                "sha256:be7b44468b8683def983e7451ab505cd85fff8d06f6b75ad7c899cedbbf789ac",
-                "sha256:c77b471e0e08e215c93a7af9a95b79193268072873fbbc0effca40f3d9b58be4"
+                "sha256:514562bb0040f18f7b3b74ed9beb943800030801058501c630c8b3fc02bafa27",
+                "sha256:93404f831114791b0756325c53b08bff73f048eeb69688be657629feaa62b507"
             ],
             "index": "pypi",
-            "version": "==0.9"
+            "version": "==0.11.0"
         },
         "markupsafe": {
             "hashes": [

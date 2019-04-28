@@ -44,6 +44,7 @@ Example:
 )
 async def get_station(
         station_id: str = Path(
+            ...,
             description='The station ID to request')
 ):
     station = await get_mongo_db().stations.find_one({'_id': station_id})
@@ -244,6 +245,7 @@ Example:
 )
 async def get_station_historic(
         station_id: str = Path(
+            ...,
             description='The station ID to request'),
         duration: int = Query(
             3600,
