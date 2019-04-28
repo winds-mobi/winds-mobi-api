@@ -1,7 +1,9 @@
-LOG_DIR = None
-SENTRY_URL = ''
+import os
 
-MONGODB_URL = 'mongodb://localhost:27017/windmobile'
+SENTRY_URL = os.environ.get('SENTRY_URL') or ''
+ENVIRONMENT = os.environ.get('ENVIRONMENT') or 'development'
+
+MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27017/windmobile'
 
 try:
     from local_settings import *  # noqa

@@ -6,11 +6,11 @@ def find_stations(l):
 
 
 def get_station(l):
-    l.client.get('/api/2/stations/windline-4107/')
+    l.client.get('/api/2/stations/windline-4107')
 
 
 def get_station_historic(l):
-    l.client.get('/api/2/stations/windline-4107/historic/')
+    l.client.get('/api/2/stations/windline-4107/historic')
 
 
 class UserBehavior(TaskSet):
