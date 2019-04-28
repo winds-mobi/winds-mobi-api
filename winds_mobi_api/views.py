@@ -31,6 +31,20 @@ def response(data):
         return JSONResponse(data, 200)
 
 
+error_detail_doc = {
+    'application/json': {
+        'schema': {
+            'type': 'object',
+            'properties': {
+                'detail': {
+                    'type': 'string'
+                }
+            }
+        }
+    }
+}
+
+
 @app.get(
     '/api/2/stations/{station_id}/',
     status_code=200,
@@ -40,7 +54,15 @@ Get a station
 
 Example:
 - Mauborget: [/api/2/stations/jdc-1001](/api/2/stations/jdc-1001)
-'''  # noqa
+''',  # noqa
+    responses={
+        404: {
+            'description': 'Station not found',
+            'content': {
+                **error_detail_doc
+            }
+        }
+    }
 )
 async def get_station(
         station_id: str = Path(
@@ -66,7 +88,21 @@ Examples:
 - Search for 3 stations around Yverdon: [/api/2/stations/?near-lat=46.78&near-lon=6.63&limit=3](/api/2/stations/?near-lat=46.78&near-lon=6.63&limit=3)
 - Search 20 km around Yverdon: [/api/2/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](/api/2/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
 - Return jdc-1001 and jdc-1002: [/api/2/stations/?ids=jdc-1001&ids=jdc-1002](/api/2/stations/?ids=jdc-1001&ids=jdc-1002)
-'''  # noqa
+''',  # noqa
+    responses={
+        400: {
+            'description': 'Bad request',
+            'content': {
+                **error_detail_doc
+            }
+        },
+        404: {
+            'description': 'Station not found',
+            'content': {
+                **error_detail_doc
+            }
+        }
+    }
 )
 async def find_stations(
         request_limit: int = Query(
@@ -241,7 +277,21 @@ Get historic data for a station since a duration
 Example:
 
 - Historic Mauborget (1 hour): [/api/2/stations/jdc-1001/historic/?duration=3600](/api/2/stations/jdc-1001/historic/?duration=3600)
-'''  # noqa
+''',  # noqa
+    responses={
+        400: {
+            'description': 'Bad request',
+            'content': {
+                **error_detail_doc
+            }
+        },
+        404: {
+            'description': 'Station not found',
+            'content': {
+                **error_detail_doc
+            }
+        }
+    }
 )
 async def get_station_historic(
         station_id: str = Path(

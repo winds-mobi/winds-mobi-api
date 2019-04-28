@@ -35,7 +35,9 @@ def get_mongo_db():
 
 app = FastAPI(
     title='winds.mobi',
-    version='2.1'
+    version='2.1',
+    # For compatibility with existing links
+    docs_url='/doc'
 )
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
 app.add_middleware(SentryMiddleware)
