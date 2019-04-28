@@ -46,14 +46,14 @@ error_detail_doc = {
 
 
 @app.get(
-    '/api/2/stations/{station_id}/',
+    '/stations/{station_id}/',
     status_code=200,
     response_model=Station,
     description='''
 Get a station
 
 Example:
-- Mauborget: [/api/2/stations/jdc-1001](/api/2/stations/jdc-1001)
+- Mauborget: [/stations/jdc-1001](/stations/jdc-1001)
 ''',  # noqa
     responses={
         404: {
@@ -76,18 +76,18 @@ async def get_station(
 
 
 @app.get(
-    '/api/2/stations/',
+    '/stations/',
     status_code=200,
     response_model=List[Station],
     description='''
 Search for stations
 
 Examples:
-- Get 5 stations from jdc.ch: [/api/2/stations/?limit=5&provider=jdc](/api/2/stations/?limit=5&provider=jdc)
-- Search (ignore accents): [/api/2/stations/?search=dole](/api/2/stations/?search=dole)
-- Search for 3 stations around Yverdon: [/api/2/stations/?near-lat=46.78&near-lon=6.63&limit=3](/api/2/stations/?near-lat=46.78&near-lon=6.63&limit=3)
-- Search 20 km around Yverdon: [/api/2/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](/api/2/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
-- Return jdc-1001 and jdc-1002: [/api/2/stations/?ids=jdc-1001&ids=jdc-1002](/api/2/stations/?ids=jdc-1001&ids=jdc-1002)
+- Get 5 stations from jdc.ch: [/stations/?limit=5&provider=jdc](/stations/?limit=5&provider=jdc)
+- Search (ignore accents): [/stations/?search=dole](/stations/?search=dole)
+- Search for 3 stations around Yverdon: [/stations/?near-lat=46.78&near-lon=6.63&limit=3](/stations/?near-lat=46.78&near-lon=6.63&limit=3)
+- Search 20 km around Yverdon: [/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
+- Return jdc-1001 and jdc-1002: [/stations/?ids=jdc-1001&ids=jdc-1002](/stations/?ids=jdc-1001&ids=jdc-1002)
 ''',  # noqa
     responses={
         400: {
@@ -268,7 +268,7 @@ async def find_stations(
 
 
 @app.get(
-    '/api/2/stations/{station_id}/historic/',
+    '/stations/{station_id}/historic/',
     status_code=200,
     response_model=List[Measure],
     description='''
@@ -276,7 +276,7 @@ Get historic data for a station since a duration
 
 Example:
 
-- Historic Mauborget (1 hour): [/api/2/stations/jdc-1001/historic/?duration=3600](/api/2/stations/jdc-1001/historic/?duration=3600)
+- Historic Mauborget (1 hour): [/stations/jdc-1001/historic/?duration=3600](/stations/jdc-1001/historic/?duration=3600)
 ''',  # noqa
     responses={
         400: {
