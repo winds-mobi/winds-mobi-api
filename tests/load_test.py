@@ -2,15 +2,15 @@ from locust import HttpLocust, TaskSet
 
 
 def find_stations(l):
-    l.client.get('/api/2/stations/?near-lat=46.7158397&near-lon=6.6394218&limit=100')
+    l.client.get('/stations/?near-lat=46.7158397&near-lon=6.6394218&limit=100')
 
 
 def get_station(l):
-    l.client.get('/api/2/stations/windline-4107')
+    l.client.get('/stations/windline-4107')
 
 
 def get_station_historic(l):
-    l.client.get('/api/2/stations/windline-4107/historic')
+    l.client.get('/stations/windline-4107/historic')
 
 
 class UserBehavior(TaskSet):

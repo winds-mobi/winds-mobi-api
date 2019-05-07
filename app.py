@@ -12,7 +12,7 @@ from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from settings import MONGODB_URL, SENTRY_URL, ENVIRONMENT
+from settings import MONGODB_URL, SENTRY_URL, ENVIRONMENT, OPENAPI_PREFIX
 
 with open(path.join(path.dirname(path.abspath(__file__)), 'logging.yaml')) as f:
     logging.config.dictConfig(yaml.load(f))
@@ -36,7 +36,7 @@ def get_mongo_db():
 app = FastAPI(
     title='winds.mobi',
     version='2.1',
-    # For compatibility with existing links
+    openapi_prefix=OPENAPI_PREFIX,
     docs_url='/doc'
 )
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
