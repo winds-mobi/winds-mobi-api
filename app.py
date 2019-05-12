@@ -12,12 +12,11 @@ from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
 
-from settings import MONGODB_URL, SENTRY_URL, ENVIRONMENT, OPENAPI_PREFIX
+from settings import MONGODB_URL, SENTRY_DSN, ENVIRONMENT, OPENAPI_PREFIX
 
 with open(path.join(path.dirname(path.abspath(__file__)), 'logging.yaml')) as f:
     logging.config.dictConfig(yaml.load(f))
-if SENTRY_URL:
-    sentry_sdk.init(SENTRY_URL, environment=ENVIRONMENT)
+sentry_sdk.init(SENTRY_DSN, environment=ENVIRONMENT)
 
 log = logging.getLogger(__name__)
 

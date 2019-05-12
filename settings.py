@@ -1,6 +1,6 @@
 import os
 
-SENTRY_URL = os.environ.get('SENTRY_URL') or ''
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
 ENVIRONMENT = os.environ.get('ENVIRONMENT') or 'development'
 
 MONGODB_URL = os.environ.get('MONGODB_URL') or 'mongodb://localhost:27017/windmobile'
