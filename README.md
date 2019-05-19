@@ -17,22 +17,21 @@ OpenAPI documentation:
 
 ### Requirements
 
-Mandatory requirements:
 - python >= 3.7
 - mongodb >= 3.0
 
-See [settings.py](https://github.com/winds-mobi/winds-mobi-providers/blob/master/settings.py)
+See [settings.py](https://github.com/winds-mobi/winds-mobi-api/blob/master/settings.py)
 
-### Install dependencies
+### Python environment
 
 - `pipenv install`
+- `pipenv shell`
 
 ### Run the server
 
-- `pipenv shell`
 - `uvicorn app:app`
 
 Licensing
 ---------
 
-Please see the file called [LICENSE.txt](https://github.com/winds-mobi/winds-mobi-providers/blob/master/LICENSE.txt)
+Please see the file called [LICENSE.txt](https://github.com/winds-mobi/winds-mobi-api/blob/master/LICENSE.txt)
