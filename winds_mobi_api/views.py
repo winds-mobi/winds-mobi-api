@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime
 from typing import List
@@ -9,7 +10,7 @@ from scipy import optimize
 from starlette.responses import JSONResponse
 from stop_words import get_stop_words, StopWordError
 
-from app import app, get_mongo_db
+from app import app, mongodb, mongodb_sync
 from winds_mobi_api import diacritics
 from winds_mobi_api.language import negotiate_language
 from winds_mobi_api.models import Station, Measure
@@ -21,7 +22,7 @@ response_validation = False
 
 @cached(ttl=10 * 60)
 async def get_collection_names():
-    return await get_mongo_db().list_collection_names()
+    return await mongodb().list_collection_names()
 
 
 def response(data):
@@ -69,7 +70,7 @@ async def get_station(
             ...,
             description='The station ID to request')
 ):
-    station = await get_mongo_db().stations.find_one({'_id': station_id})
+    station = await mongodb().stations.find_one({'_id': station_id})
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
     return response(station)
@@ -207,7 +208,7 @@ async def find_stations(
                 }
             }
         # $near results are already sorted: return now
-        cursor = get_mongo_db().stations.find(query, projection_dict).limit(limit)
+        cursor = mongodb().stations.find(query, projection_dict).limit(limit)
         return response(await cursor.to_list(None))
 
     if within_pt1_latitude and within_pt1_longitude and within_pt2_latitude and within_pt2_longitude:
@@ -223,7 +224,7 @@ async def find_stations(
         }
 
         now = datetime.now().timestamp()
-        nb_stations = await get_mongo_db().stations.count_documents({
+        nb_stations = await mongodb().stations.count_documents({
             'status': {'$ne': 'hidden'},
             'last._id': {'$gt': now - 30 * 24 * 3600}
         })
@@ -233,33 +234,37 @@ async def find_stations(
             cluster_query['clusters'] = {'$elemMatch': {'$lte': int(no_cluster)}}
             return cluster_query
 
-        async def count(x):
-            y = await get_mongo_db().stations.count_documents(get_cluster_query(x))
+        def count(x):
+            y = mongodb_sync().stations.count(get_cluster_query(x))
             return y - limit
 
+        def no_cluster_task():
+            return optimize.brentq(count, 1, nb_stations, maxiter=2, disp=False)
+
         try:
-            no_cluster = optimize.brentq(count, 1, nb_stations, maxiter=2, disp=False)
+            # CPU an IO bound task using a sync library: executing it in a separated thread to not block the event loop
+            no_cluster = await asyncio.get_running_loop().run_in_executor(None, no_cluster_task)
         except ValueError:
             no_cluster = None
 
         if no_cluster:
-            cursor = get_mongo_db().stations.find(get_cluster_query(no_cluster), projection_dict)
+            cursor = mongodb().stations.find(get_cluster_query(no_cluster), projection_dict)
             stations = await cursor.to_list(None)
             log.debug(f'limit={limit}, no_cluster={no_cluster:.0f} => {len(stations)}')
         else:
-            cursor = get_mongo_db().stations.find(query, projection_dict)
+            cursor = mongodb().stations.find(query, projection_dict)
             stations = await cursor.to_list(None)
             log.debug(f'limit={limit} => {len(stations)}')
         return response(stations)
 
     if ids:
         query['_id'] = {'$in': ids}
-        cursor = get_mongo_db().stations.find(query, projection_dict)
+        cursor = mongodb().stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
         stations.sort(key=lambda station: ids.index(station['_id']))
         return response(stations)
 
-    cursor = get_mongo_db().stations.find(query, projection_dict).sort('short', pymongo.ASCENDING)
+    cursor = mongodb().stations.find(query, projection_dict).sort('short', pymongo.ASCENDING)
     if use_limit:
         cursor.limit(limit)
     elif request_limit >= 1:
@@ -313,7 +318,7 @@ async def get_station_historic(
     if duration > 7 * 24 * 3600:
         raise HTTPException(status_code=400, detail='Duration > 7 days')
 
-    station = await get_mongo_db().stations.find_one({'_id': station_id})
+    station = await mongodb().stations.find_one({'_id': station_id})
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
 
@@ -321,6 +326,6 @@ async def get_station_historic(
         raise HTTPException(status_code=404, detail=f"No historic data for station id '{station_id}'")
     last_time = station['last']['_id']
     start_time = last_time - duration
-    nb_data = await get_mongo_db()[station_id].count_documents({'_id': {'$gte': start_time}}) + 1
-    cursor = get_mongo_db()[station_id].find({}, projection_dict, sort=(('_id', -1),)).limit(nb_data)
+    nb_data = await mongodb()[station_id].count_documents({'_id': {'$gte': start_time}}) + 1
+    cursor = mongodb()[station_id].find({}, projection_dict, sort=(('_id', -1),)).limit(nb_data)
     return response(await cursor.to_list(None))

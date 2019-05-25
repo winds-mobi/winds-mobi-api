@@ -8,6 +8,7 @@ import uvloop
 import yaml
 from fastapi import FastAPI
 from motor import motor_asyncio
+from pymongo import MongoClient
 from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import JSONResponse
@@ -21,15 +22,17 @@ sentry_sdk.init(SENTRY_DSN, environment=ENVIRONMENT)
 log = logging.getLogger(__name__)
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-mongo_db = None
+
+_mongodb = None
+_mongodb_sync = None
 
 
-def get_mongo_db():
-    global mongo_db
+def mongodb():
+    return _mongodb
 
-    if not mongo_db:
-        mongo_db = motor_asyncio.AsyncIOMotorClient(MONGODB_URL).get_database()
-    return mongo_db
+
+def mongodb_sync():
+    return _mongodb_sync
 
 
 app = FastAPI(
@@ -40,6 +43,14 @@ app = FastAPI(
 )
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
 app.add_middleware(SentryMiddleware)
+
+
+@app.on_event("startup")
+async def startup_event():
+    global _mongodb
+    global _mongodb_sync
+    _mongodb = motor_asyncio.AsyncIOMotorClient(MONGODB_URL).get_database()
+    _mongodb_sync = MongoClient(MONGODB_URL).get_database()
 
 
 @app.exception_handler(pymongo.errors.OperationFailure)
