@@ -45,7 +45,7 @@ class Measure(BaseModel):
 
     id: datetime = Schema(
         ..., alias='_id',
-        description='Unix time'
+        description='Last measure [unix timestamp]'
     )
     w_dir: int = Schema(
         None, alias='w-dir',
@@ -75,6 +75,21 @@ class Measure(BaseModel):
         None,
         description='Air pressure'
     )
+
+
+class MeasureKey(str, Enum):
+    id = '_id'
+    w_dir = 'w-dir'
+    w_avg = 'w-avg'
+    w_max = 'w-max'
+    temp = 'temp'
+    hum = 'hum'
+    rain = 'rain'
+    pres = 'pres'
+
+
+measure_key_defaults = [MeasureKey.id, MeasureKey.w_dir, MeasureKey.w_avg, MeasureKey.w_max, MeasureKey.temp,
+                        MeasureKey.hum, MeasureKey.rain, MeasureKey.pres]
 
 
 class Station(BaseModel):
@@ -119,10 +134,6 @@ class Station(BaseModel):
         None,
         description='Status'
     )
-    seen: datetime = Schema(
-        None,
-        description='last time updated (unix time)'
-    )
     tz: str = Schema(
         None,
         description='Timezone (Europe/Zurich)'
@@ -139,3 +150,32 @@ class Station(BaseModel):
         None,
         description='Urls to the provider station per language'
     )
+
+
+class StationKey(str, Enum):
+    pv_id = 'pv-id'
+    pv_code = 'pv-code'
+    pv_name = 'pv-name'
+    short = 'short'
+    name = 'name'
+    alt = 'alt'
+    peak = 'peak'
+    status = 'status'
+    tz = 'tz'
+    loc = 'loc'
+    url = 'url'
+    last_id = 'last._id'
+    last_w_dir = 'last.w-dir'
+    last_w_avg = 'last.w-avg'
+    last_w_max = 'last.w-max'
+    last_temp = 'last.temp'
+    last_hum = 'last.hum'
+    last_rain = 'last.rain'
+    last_pres = 'last.pres'
+
+
+station_key_defaults = [StationKey.pv_code, StationKey.pv_name, StationKey.short, StationKey.name, StationKey.alt,
+                        StationKey.peak, StationKey.status, StationKey.tz, StationKey.loc,
+
+                        StationKey.last_id, StationKey.last_w_dir, StationKey.last_w_avg, StationKey.last_w_max,
+                        StationKey.last_temp, StationKey.last_hum, StationKey.last_rain, StationKey.last_pres]

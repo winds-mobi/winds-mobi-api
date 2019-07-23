@@ -5,13 +5,13 @@ verify_ssl = true
 
 [packages]
 aiocache = "==0.10.1"
-fastapi = "==0.24.0"
+fastapi = "==0.33.0"
 motor = "==2.0"
 parse-accept-language = "==0.1.2"
 pyaml = "==19.4.1"
 scipy = "==1.2.1"
 sentry-asgi = "==0.2.0"
-sentry-sdk = "==0.8.0"
+sentry-sdk = "==0.9.5"
 stop-words = "==2018.7.23"
 ujson = "==1.35"
 uvicorn = "==0.7.0"

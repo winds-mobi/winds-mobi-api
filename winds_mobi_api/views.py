@@ -5,24 +5,24 @@ from typing import List
 
 import pymongo
 from aiocache import cached
-from fastapi import HTTPException, Path, Query, Header
+from fastapi import HTTPException, Path, Query, Header, APIRouter
 from scipy import optimize
 from starlette.responses import JSONResponse
 from stop_words import get_stop_words, StopWordError
 
-from app import app, mongodb, mongodb_sync
-from winds_mobi_api import diacritics
+from winds_mobi_api import diacritics, database
 from winds_mobi_api.language import negotiate_language
-from winds_mobi_api.models import Station, Measure
+from winds_mobi_api.models import Station, StationKey, Measure, MeasureKey, station_key_defaults, measure_key_defaults
 from winds_mobi_api.mongo_utils import generate_box_geometry
 
 log = logging.getLogger(__name__)
 response_validation = False
+router = APIRouter()
 
 
 @cached(ttl=10 * 60)
 async def get_collection_names():
-    return await mongodb().list_collection_names()
+    return await database.mongodb().list_collection_names()
 
 
 def response(data):
@@ -46,7 +46,7 @@ error_detail_doc = {
 }
 
 
-@app.get(
+@router.get(
     '/stations/{station_id}/',
     status_code=200,
     response_model=Station,
@@ -68,15 +68,24 @@ Example:
 async def get_station(
         station_id: str = Path(
             ...,
-            description='The station ID to request')
+            description='The station ID to request'),
+        keys: List[StationKey] = Query(
+            station_key_defaults,
+            description='List of keys to return'),
 ):
-    station = await mongodb().stations.find_one({'_id': station_id})
+    projection_dict = {}
+    for key in keys:
+        projection_dict[key.value] = 1
+    # last._id should be always returned
+    projection_dict['last._id'] = 1
+
+    station = await database.mongodb().stations.find_one({'_id': station_id}, projection_dict)
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
     return response(station)
 
 
-@app.get(
+@router.get(
     '/stations/',
     status_code=200,
     response_model=List[Station],
@@ -109,13 +118,14 @@ async def find_stations(
         request_limit: int = Query(
             20, alias='limit',
             description='Nb stations to return (max=500)'),
+        keys: List[StationKey] = Query(
+            station_key_defaults,
+            description='List of keys to return'),
         provider: str = Query(
             None,
             description='Returns only stations of the given provider'),
         search: str = Query(
             None, description='String to search (ignoring accent)'),
-        keys: List[str] = Query(
-            None, description='List of keys to return'),
         search_language: str = Query(
             None, alias='search-language',
             description="Language of the search. Default to request language or 'en'"),
@@ -140,6 +150,9 @@ async def find_stations(
         within_pt2_longitude: float = Query(
             None, alias='within-pt2-lon',
             description='Geo search within rectangle: pt2 longitude'),
+        is_peak: bool = Query(
+            None, alias='is-peak',
+            description='Return only the stations that are located on top of a peak'),
         ids: List[str] = Query(
             None,
             description='Returns stations by ids'),
@@ -151,12 +164,11 @@ async def find_stations(
         limit = 500
     use_limit = True
 
-    if keys:
-        projection_dict = {}
-        for key in keys:
-            projection_dict[key] = 1
-    else:
-        projection_dict = None
+    projection_dict = {}
+    for key in keys:
+        projection_dict[key.value] = 1
+    # last._id should be always returned
+    projection_dict['last._id'] = 1
 
     now = datetime.now().timestamp()
     query = {
@@ -187,6 +199,9 @@ async def find_stations(
         if or_queries:
             query['$or'] = or_queries
 
+    if is_peak is not None:
+        query['peak'] = {'$eq': is_peak}
+
     if near_latitude and near_longitude:
         if near_distance:
             query['loc'] = {
@@ -208,7 +223,7 @@ async def find_stations(
                 }
             }
         # $near results are already sorted: return now
-        cursor = mongodb().stations.find(query, projection_dict).limit(limit)
+        cursor = database.mongodb().stations.find(query, projection_dict).limit(limit)
         return response(await cursor.to_list(None))
 
     if within_pt1_latitude and within_pt1_longitude and within_pt2_latitude and within_pt2_longitude:
@@ -224,7 +239,7 @@ async def find_stations(
         }
 
         now = datetime.now().timestamp()
-        nb_stations = await mongodb().stations.count_documents({
+        nb_stations = await database.mongodb().stations.count_documents({
             'status': {'$ne': 'hidden'},
             'last._id': {'$gt': now - 30 * 24 * 3600}
         })
@@ -235,7 +250,7 @@ async def find_stations(
             return cluster_query
 
         def count(x):
-            y = mongodb_sync().stations.count(get_cluster_query(x))
+            y = database.mongodb_sync().stations.count(get_cluster_query(x))
             return y - limit
 
         def no_cluster_task():
@@ -248,23 +263,23 @@ async def find_stations(
             no_cluster = None
 
         if no_cluster:
-            cursor = mongodb().stations.find(get_cluster_query(no_cluster), projection_dict)
+            cursor = database.mongodb().stations.find(get_cluster_query(no_cluster), projection_dict)
             stations = await cursor.to_list(None)
             log.debug(f'limit={limit}, no_cluster={no_cluster:.0f} => {len(stations)}')
         else:
-            cursor = mongodb().stations.find(query, projection_dict)
+            cursor = database.mongodb().stations.find(query, projection_dict)
             stations = await cursor.to_list(None)
             log.debug(f'limit={limit} => {len(stations)}')
         return response(stations)
 
     if ids:
         query['_id'] = {'$in': ids}
-        cursor = mongodb().stations.find(query, projection_dict)
+        cursor = database.mongodb().stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
         stations.sort(key=lambda station: ids.index(station['_id']))
         return response(stations)
 
-    cursor = mongodb().stations.find(query, projection_dict).sort('short', pymongo.ASCENDING)
+    cursor = database.mongodb().stations.find(query, projection_dict).sort('short', pymongo.ASCENDING)
     if use_limit:
         cursor.limit(limit)
     elif request_limit >= 1:
@@ -272,7 +287,7 @@ async def find_stations(
     return response(await cursor.to_list(None))
 
 
-@app.get(
+@router.get(
     '/stations/{station_id}/historic/',
     status_code=200,
     response_model=List[Measure],
@@ -305,20 +320,17 @@ async def get_station_historic(
         duration: int = Query(
             3600,
             description='Historic duration'),
-        keys: List[str] = Query(
-            None, description='List of keys to return')
+        keys: List[MeasureKey] = Query(
+            measure_key_defaults, description='List of keys to return')
 ):
-    if keys:
-        projection_dict = {}
-        for key in keys:
-            projection_dict[key] = 1
-    else:
-        projection_dict = None
+    projection_dict = {}
+    for key in keys:
+        projection_dict[key.value] = 1
 
     if duration > 7 * 24 * 3600:
         raise HTTPException(status_code=400, detail='Duration > 7 days')
 
-    station = await mongodb().stations.find_one({'_id': station_id})
+    station = await database.mongodb().stations.find_one({'_id': station_id})
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
 
@@ -326,6 +338,6 @@ async def get_station_historic(
         raise HTTPException(status_code=404, detail=f"No historic data for station id '{station_id}'")
     last_time = station['last']['_id']
     start_time = last_time - duration
-    nb_data = await mongodb()[station_id].count_documents({'_id': {'$gte': start_time}}) + 1
-    cursor = mongodb()[station_id].find({}, projection_dict, sort=(('_id', -1),)).limit(nb_data)
+    nb_data = await database.mongodb()[station_id].count_documents({'_id': {'$gte': start_time}}) + 1
+    cursor = database.mongodb()[station_id].find({}, projection_dict, sort=(('_id', -1),)).limit(nb_data)
     return response(await cursor.to_list(None))
