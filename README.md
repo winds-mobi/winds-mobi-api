@@ -7,6 +7,8 @@ on your smartphone, your tablet or your computer.
 Follow this project on:
 - [Facebook](https://www.facebook.com/WindsMobi/)
 
+- [![Join the chat at https://gitter.im/winds-mobi/winds-mobi-api](https://badges.gitter.im/winds-mobi/winds-mobi-api.svg)](https://gitter.im/winds-mobi/winds-mobi-api?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 winds-mobi-api
 --------------------
 
