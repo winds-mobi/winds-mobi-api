@@ -54,7 +54,7 @@ error_detail_doc = {
 Get a station
 
 Example:
-- Mauborget: [/stations/jdc-1001](/stations/jdc-1001)
+- Mauborget: [stations/jdc-1001](stations/jdc-1001)
 ''',  # noqa
     responses={
         404: {
@@ -93,11 +93,11 @@ async def get_station(
 Search for stations
 
 Examples:
-- Get 5 stations from jdc.ch: [/stations/?limit=5&provider=jdc](/stations/?limit=5&provider=jdc)
-- Search (ignore accents): [/stations/?search=dole](/stations/?search=dole)
-- Search for 3 stations around Yverdon: [/stations/?near-lat=46.78&near-lon=6.63&limit=3](/stations/?near-lat=46.78&near-lon=6.63&limit=3)
-- Search 20 km around Yverdon: [/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](/stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
-- Return jdc-1001 and jdc-1002: [/stations/?ids=jdc-1001&ids=jdc-1002](/stations/?ids=jdc-1001&ids=jdc-1002)
+- Get 5 stations from jdc.ch: [stations/?limit=5&provider=jdc](stations/?limit=5&provider=jdc)
+- Search (ignore accents): [stations/?search=dole](stations/?search=dole)
+- Search for 3 stations around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&limit=3](stations/?near-lat=46.78&near-lon=6.63&limit=3)
+- Search 20 km around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
+- Return jdc-1001 and jdc-1002: [stations/?ids=jdc-1001&ids=jdc-1002](stations/?ids=jdc-1001&ids=jdc-1002)
 ''',  # noqa
     responses={
         400: {
@@ -296,7 +296,7 @@ Get historic data for a station since a duration
 
 Example:
 
-- Historic Mauborget (1 hour): [/stations/jdc-1001/historic/?duration=3600](/stations/jdc-1001/historic/?duration=3600)
+- Historic Mauborget (1 hour): [stations/jdc-1001/historic/?duration=3600](stations/jdc-1001/historic/?duration=3600)
 ''',  # noqa
     responses={
         400: {

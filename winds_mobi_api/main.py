@@ -11,9 +11,9 @@ from motor import motor_asyncio
 from pymongo import MongoClient
 from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, RedirectResponse
 
-from settings import MONGODB_URL, SENTRY_DSN, ENVIRONMENT, OPENAPI_PREFIX
+from settings import MONGODB_URL, SENTRY_DSN, ENVIRONMENT, OPENAPI_PREFIX, DOC_PATH
 from winds_mobi_api import database, views
 
 with open(path.join(path.dirname(path.abspath(__file__)), 'logging.yaml')) as f:
@@ -29,7 +29,7 @@ app = FastAPI(
     title='winds.mobi',
     version='2.2',
     openapi_prefix=OPENAPI_PREFIX,
-    docs_url='/doc'
+    docs_url=f'/{DOC_PATH}'
 )
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
 app.add_middleware(SentryMiddleware)
@@ -45,6 +45,11 @@ async def startup_event():
 async def mongo_exception(request, exc):
     log.error('Mongodb error', exc_info=exc)
     return JSONResponse({'detail': 'Mongodb error'}, status_code=400)
+
+
+@app.get('/', include_in_schema=False)
+async def root():
+    return RedirectResponse(url=DOC_PATH)
 
 # Register our views
 app.include_router(views.router, prefix='', tags=['Stations'])
