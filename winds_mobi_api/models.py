@@ -14,26 +14,26 @@ class Status(str, Enum):
 class Location(BaseModel):
     type: str = Schema(
         'Point',
-        description='GeoJSON type'
+        title='GeoJSON type'
     )
     coordinates: List[float] = Schema(
         None,
-        description='longitude, latitude'
+        title='longitude, latitude'
     )
 
 
 class Pressure(BaseModel):
     qfe: float = Schema(
         ...,
-        description='QFE [hPa]'
+        title='QFE [hPa]'
     )
     qnh: float = Schema(
         ...,
-        description='QNH [hPa]'
+        title='QNH [hPa]'
     )
     qff: float = Schema(
         ...,
-        description='QFF [hPa]'
+        title='QFF [hPa]'
     )
 
 
@@ -45,35 +45,35 @@ class Measure(BaseModel):
 
     id: datetime = Schema(
         ..., alias='_id',
-        description='Last measure [unix timestamp]'
+        title='Last measure [unix timestamp]'
     )
     w_dir: int = Schema(
         None, alias='w-dir',
-        description='Wind direction [°](0-359)'
+        title='Wind direction [°](0-359)'
     )
     w_avg: float = Schema(
         None, alias='w-avg',
-        description='Wind speed [km/h]'
+        title='Wind speed [km/h]'
     )
     w_max: float = Schema(
         None, alias='w-max',
-        description='Wind speed max [km/h]'
+        title='Wind speed max [km/h]'
     )
     temp: float = Schema(
         None,
-        description='Temperature [°C]'
+        title='Temperature [°C]'
     )
     hum: float = Schema(
         None,
-        description='Air humidity [%rH]'
+        title='Air humidity [%rH]'
     )
     rain: float = Schema(
         None,
-        description='Rain [l/m²]'
+        title='Rain [l/m²]'
     )
     pres: Pressure = Schema(
         None,
-        description='Air pressure'
+        title='Air pressure'
     )
 
 
@@ -100,55 +100,55 @@ class Station(BaseModel):
 
     id: str = Schema(
         ..., alias='_id',
-        description='Unique ID {pv-code}-{pv-id} (jdc-1010)'
+        title='Unique ID {pv-code}-{pv-id} (jdc-1010)'
     )
     pv_id: str = Schema(
         None, alias='pv-id',
-        description='Provider ID'
+        title='Provider ID'
     )
     pv_code: str = Schema(
         None, alias='pv-code',
-        description='Provider code (jdc)'
+        title='Provider code (jdc)'
     )
     pv_name: str = Schema(
         None, alias='pv-name',
-        description='Provider name (jdc.ch)'
+        title='Provider name (jdc.ch)'
     )
     short: str = Schema(
         None,
-        description='Short name'
+        title='Short name'
     )
     name: str = Schema(
         None,
-        description='Name'
+        title='Name'
     )
     alt: int = Schema(
         None,
-        description='Altitude [m]'
+        title='Altitude [m]'
     )
     peak: bool = Schema(
         None,
-        description='Is the station on a peak'
+        title='Is the station on a peak'
     )
     status: Status = Schema(
         None,
-        description='Status'
+        title='Status'
     )
     tz: str = Schema(
         None,
-        description='Timezone (Europe/Zurich)'
+        title='Timezone (Europe/Zurich)'
     )
     loc: Location = Schema(
         None,
-        description='Location [geoJSON point]'
+        title='Location [geoJSON point]'
     )
     last: Measure = Schema(
         None,
-        description='Last measurement values'
+        title='Last measurement values'
     )
     url: Optional[Dict[str, str]] = Schema(
         None,
-        description='Urls to the provider station per language'
+        title='Urls to the provider station per language'
     )
 
 
@@ -174,8 +174,8 @@ class StationKey(str, Enum):
     last_pres = 'last.pres'
 
 
-station_key_defaults = [StationKey.pv_code, StationKey.pv_name, StationKey.short, StationKey.name, StationKey.alt,
-                        StationKey.peak, StationKey.status, StationKey.tz, StationKey.loc,
+station_key_defaults = [StationKey.pv_name, StationKey.short, StationKey.name, StationKey.alt, StationKey.peak,
+                        StationKey.status, StationKey.tz, StationKey.loc,
 
                         StationKey.last_id, StationKey.last_w_dir, StationKey.last_w_avg, StationKey.last_w_max,
                         StationKey.last_temp, StationKey.last_hum, StationKey.last_rain, StationKey.last_pres]

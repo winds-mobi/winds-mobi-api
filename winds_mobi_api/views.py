@@ -50,9 +50,8 @@ error_detail_doc = {
     '/stations/{station_id}/',
     status_code=200,
     response_model=Station,
+    summary='Get a station',
     description='''
-Get a station
-
 Example:
 - Mauborget: [stations/jdc-1001](stations/jdc-1001)
 ''',  # noqa
@@ -89,9 +88,8 @@ async def get_station(
     '/stations/',
     status_code=200,
     response_model=List[Station],
+    summary='Search for stations',
     description='''
-Search for stations
-
 Examples:
 - Get 5 stations from jdc.ch: [stations/?limit=5&provider=jdc](stations/?limit=5&provider=jdc)
 - Search (ignore accents): [stations/?search=dole](stations/?search=dole)
@@ -291,9 +289,8 @@ async def find_stations(
     '/stations/{station_id}/historic/',
     status_code=200,
     response_model=List[Measure],
+    summary='Get historic data for a station since a duration',
     description='''
-Get historic data for a station since a duration
-
 Example:
 
 - Historic Mauborget (1 hour): [stations/jdc-1001/historic/?duration=3600](stations/jdc-1001/historic/?duration=3600)
