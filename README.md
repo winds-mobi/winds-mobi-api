@@ -7,9 +7,10 @@ winds.mobi - real-time weather observations
 [winds.mobi](http://winds.mobi): Paraglider pilot, kitesurfer, check real-time weather conditions of your favorite spots
 on your smartphone, your tablet or your computer.
 
-**Latest version**: [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc)  
-Deprecated version: ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~  
-[winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~
+Deployed API versions:
+- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc) (**latest**)
+- ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~ (deprecated)
+- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~
 
 winds-mobi-api
 --------------------
