@@ -25,7 +25,7 @@ OpenAPI documentation:
 - python >= 3.7
 - mongodb >= 3.0
 
-See [settings.py](https://github.com/winds-mobi/winds-mobi-api/blob/master/settings.py)
+See [settings.py](settings.py)
 
 ### Python environment
 
@@ -34,9 +34,14 @@ See [settings.py](https://github.com/winds-mobi/winds-mobi-api/blob/master/setti
 
 ### Run the server
 
-- `uvicorn app:app`
+- `uvicorn winds_mobi_api.main:app`
+
+Version history
+---------------
+
+See [CHANGELOG.md](CHANGELOG.md).
 
 Licensing
 ---------
 
-Please see the file called [LICENSE.txt](https://github.com/winds-mobi/winds-mobi-api/blob/master/LICENSE.txt)
+See [LICENSE.txt](LICENSE.txt)
