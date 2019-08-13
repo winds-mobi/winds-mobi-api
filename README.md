@@ -8,15 +8,15 @@ winds.mobi - real-time weather observations
 [winds.mobi](http://winds.mobi): Paraglider pilot, kitesurfer, check real-time weather conditions of your favorite spots
 on your smartphone, your tablet or your computer.
 
-Deployed API versions:
-- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc) (**latest**)
-- ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~ (deprecated)
-- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~
-
 winds-mobi-api
 --------------------
 
 Python 3.7 standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
+
+Deployed API versions:
+- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc) (**latest**)
+- ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~ (deprecated)
+- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~
 
 OpenAPI documentation:
 - /doc
