@@ -1,7 +1,7 @@
 import asyncio
 import logging
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
 import pymongo
 from aiocache import cached
@@ -12,7 +12,8 @@ from stop_words import get_stop_words, StopWordError
 
 from winds_mobi_api import diacritics, database
 from winds_mobi_api.language import negotiate_language
-from winds_mobi_api.models import Station, StationKey, Measure, MeasureKey, station_key_defaults, measure_key_defaults
+from winds_mobi_api.models import (Station, StationKey, Measure, MeasureKey, station_key_defaults, measure_key_defaults,
+                                   Status)
 from winds_mobi_api.mongo_utils import generate_box_geometry
 
 log = logging.getLogger(__name__)
@@ -96,6 +97,7 @@ Examples:
 - Search for 3 stations around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&limit=3](stations/?near-lat=46.78&near-lon=6.63&limit=3)
 - Search 20 km around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
 - Return jdc-1001 and jdc-1002: [stations/?ids=jdc-1001&ids=jdc-1002](stations/?ids=jdc-1001&ids=jdc-1002)
+- Search for 3 working mountain stations that have measures more recent than 1 hour: [stations/?status=green&limit=3&is-peak=true&last-measure=3600](stations/?status=green&limit=3&is-peak=true&last-measure=3600)
 ''',  # noqa
     responses={
         400: {
@@ -151,6 +153,13 @@ async def find_stations(
         is_peak: bool = Query(
             None, alias='is-peak',
             description='Return only the stations that are located on top of a peak'),
+        status: Status = Query(
+            None,
+            description="Return only the stations with the given status: 'green', 'orange' or 'red'"),
+        last_measure: Union[int, datetime] = Query(
+            None, alias='last-measure',
+            description='Return only the stations with measures more recent that {last_measure}. '
+                        "Could be a duration in seconds or a absolute datetime, for example: '2019-08-16 9:30'"),
         ids: List[str] = Query(
             None,
             description='Returns stations by ids'),
@@ -199,6 +208,18 @@ async def find_stations(
 
     if is_peak is not None:
         query['peak'] = {'$eq': is_peak}
+
+    if status is not None:
+        query['status'] = {'$eq': status}
+
+    if last_measure is not None:
+        timestamp = None
+        if isinstance(last_measure, int):
+            timestamp = datetime.now().timestamp() - last_measure
+        elif isinstance(last_measure, datetime):
+            timestamp = last_measure.timestamp()
+        if timestamp:
+            query['last._id'] = {'$gte': int(timestamp)}
 
     if near_latitude and near_longitude:
         if near_distance:

@@ -1,6 +1,6 @@
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Dict, List
+from typing import Dict, List
 
 from pydantic import BaseModel, Schema
 
@@ -14,26 +14,31 @@ class Status(str, Enum):
 class Location(BaseModel):
     type: str = Schema(
         'Point',
-        title='GeoJSON type'
+        title='Type',
+        description='GeoJSON type'
     )
     coordinates: List[float] = Schema(
         None,
-        title='longitude, latitude'
+        title='Coordinates',
+        description='longitude, latitude'
     )
 
 
 class Pressure(BaseModel):
     qfe: float = Schema(
         ...,
-        title='QFE [hPa]'
+        title='QFE',
+        description='QFE [hPa]'
     )
     qnh: float = Schema(
         ...,
-        title='QNH [hPa]'
+        title='QNH',
+        description='QNH [hPa]'
     )
     qff: float = Schema(
         ...,
-        title='QFF [hPa]'
+        title='QFF',
+        description='QFF [hPa]'
     )
 
 
@@ -45,35 +50,43 @@ class Measure(BaseModel):
 
     id: datetime = Schema(
         ..., alias='_id',
-        title='Last measure [unix timestamp]'
+        title='_ID',
+        description='Measure date [unix timestamp]'
     )
     w_dir: int = Schema(
         None, alias='w-dir',
-        title='Wind direction [°](0-359)'
+        title='Wind direction',
+        description='Wind direction [°] (0-359)'
     )
     w_avg: float = Schema(
         None, alias='w-avg',
-        title='Wind speed [km/h]'
+        title='Wind average',
+        description='Wind speed [km/h]'
     )
     w_max: float = Schema(
         None, alias='w-max',
-        title='Wind speed max [km/h]'
+        title='Wind max',
+        description='Wind speed max [km/h]'
     )
     temp: float = Schema(
         None,
-        title='Temperature [°C]'
+        title='Temperature',
+        description='Temperature [°C]'
     )
     hum: float = Schema(
         None,
-        title='Air humidity [%rH]'
+        title='Humidity',
+        description='Air humidity [%rH]'
     )
     rain: float = Schema(
         None,
-        title='Rain [l/m²]'
+        title='Rain',
+        description='Rain [l/m²]'
     )
     pres: Pressure = Schema(
         None,
-        title='Air pressure'
+        title='Pressure',
+        description='Air pressure'
     )
 
 
@@ -100,55 +113,68 @@ class Station(BaseModel):
 
     id: str = Schema(
         ..., alias='_id',
-        title='Unique ID {pv-code}-{pv-id} (jdc-1010)'
+        title='_ID',
+        description="Station ID '{pv-code}-{pv-id}', example: 'jdc-1010'"
     )
     pv_id: str = Schema(
         None, alias='pv-id',
-        title='Provider ID'
+        title='Provider ID',
+        description="Station ID in provider space, example: '1010'"
     )
     pv_code: str = Schema(
         None, alias='pv-code',
-        title='Provider code (jdc)'
+        title='Provider code',
+        description="Example: 'jdc'"
     )
     pv_name: str = Schema(
         None, alias='pv-name',
-        title='Provider name (jdc.ch)'
+        title='Provider name',
+        description="Full provider name, example: 'jdc.ch'"
     )
     short: str = Schema(
         None,
-        title='Short name'
+        title='Short name',
+        description='Short name of the station'
     )
     name: str = Schema(
         None,
-        title='Name'
+        title='Name',
+        description='Full name of the station'
     )
     alt: int = Schema(
         None,
-        title='Altitude [m]'
+        title='Altitude',
+        description='Altitude [m]'
     )
     peak: bool = Schema(
         None,
-        title='Is the station on a peak'
+        title='Peak',
+        description='Is the station on a peak'
     )
     status: Status = Schema(
         None,
-        title='Status'
+        title='Status',
+        description="'green': station ok, 'orange': data might be inaccurate, 'red': station isn't working"
     )
     tz: str = Schema(
         None,
-        title='Timezone (Europe/Zurich)'
+        title='Timezone',
+        description='Timezone, example: Europe/Zurich'
     )
     loc: Location = Schema(
         None,
-        title='Location [geoJSON point]'
+        title='Location',
+        description='Location [geoJSON point]'
     )
     last: Measure = Schema(
         None,
-        title='Last measurement values'
+        title='Last measure',
+        description='Last measurement values'
     )
-    url: Optional[Dict[str, str]] = Schema(
+    url: Dict[str, str] = Schema(
         None,
-        title='Urls to the provider station per language'
+        title='Url',
+        description='Url to the provider station per language'
     )
 
 
