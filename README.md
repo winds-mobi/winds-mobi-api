@@ -16,7 +16,7 @@ Python 3.7 standalone asyncIO API that provides different endpoints to get weath
 Deployed API versions:
 - [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc) (**latest**)
 - ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~ (deprecated)
-- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> ~~[winds.mobi/api/2.1/](https://winds.mobi/api/2.1/doc)~~
+- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> latest version
 
 OpenAPI documentation:
 - /doc
