@@ -48,10 +48,11 @@ class Measure(BaseModel):
             datetime: lambda d: d.timestamp()
         }
 
-    id: datetime = Schema(
+    id: int = Schema(
         ..., alias='_id',
         title='_ID',
-        description='Measure date [unix timestamp]'
+        description='Measure date [unix timestamp]',
+        example=1565722207
     )
     w_dir: int = Schema(
         None, alias='w-dir',
@@ -114,22 +115,22 @@ class Station(BaseModel):
     id: str = Schema(
         ..., alias='_id',
         title='_ID',
-        description="Station ID '{pv-code}-{pv-id}', example: 'jdc-1010'"
+        description='Station ID {pv-code}-{pv-id}, example: jdc-1010'
     )
     pv_id: str = Schema(
         None, alias='pv-id',
         title='Provider ID',
-        description="Station ID in provider space, example: '1010'"
+        description='Station ID in provider space, example: 1010'
     )
     pv_code: str = Schema(
         None, alias='pv-code',
         title='Provider code',
-        description="Example: 'jdc'"
+        description='Example: jdc'
     )
     pv_name: str = Schema(
         None, alias='pv-name',
         title='Provider name',
-        description="Full provider name, example: 'jdc.ch'"
+        description='Full provider name, example: jdc.ch'
     )
     short: str = Schema(
         None,
@@ -154,7 +155,7 @@ class Station(BaseModel):
     status: Status = Schema(
         None,
         title='Status',
-        description="'green': station ok, 'orange': data might be inaccurate, 'red': station isn't working"
+        description="green: station ok, orange: data might be inaccurate, red: station isn't working"
     )
     tz: str = Schema(
         None,

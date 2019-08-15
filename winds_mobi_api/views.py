@@ -158,8 +158,8 @@ async def find_stations(
             description="Return only the stations with the given status: 'green', 'orange' or 'red'"),
         last_measure: Union[int, datetime] = Query(
             None, alias='last-measure',
-            description='Return only the stations with measures more recent that {last_measure}. '
-                        "Could be a duration in seconds or a absolute datetime, for example: '2019-08-16 9:30'"),
+            description='Return only the stations with a measure more recent that {last-measure}. '
+                        'Can be a duration in seconds or a absolute datetime, for example: 2019-08-16 15:30'),
         ids: List[str] = Query(
             None,
             description='Returns stations by ids'),
