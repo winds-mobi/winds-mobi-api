@@ -174,8 +174,15 @@ class Station(BaseModel):
     )
     url: Dict[str, str] = Schema(
         None,
-        title='Url',
-        description='Url to the provider station per language'
+        title='Provider urls',
+        description="""Urls to the provider station per language. Example:
+```
+{
+    'default': 'https://provider.com/path/to/station?lang=en',
+    'en': 'https://provider.com/path/to/station?lang=en',
+    'fr': 'https://provider.com/path/to/station?lang=fr'
+}
+```"""
     )
 
 
