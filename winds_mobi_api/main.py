@@ -29,7 +29,16 @@ app = FastAPI(
     title='winds.mobi',
     version='2.2',
     openapi_prefix=OPENAPI_PREFIX,
-    docs_url=f'/{DOC_PATH}'
+    docs_url=f'/{DOC_PATH}',
+    description="""### Welcome to winds.mobi API
+Feel free to use this API. The data indexed by winds.mobi are kindly shared by their providers and belongs to them. 
+Do not try to monetize your service that is using this API data in any way: paid application, in-app purchase, 
+advertisement, ...
+
+Don't overload winds.mobi by caching the data on your side and please use an IP address with a reverse DNS (PTR record) 
+that publicly identifies you.
+
+Any IP that doesn't respect these rules could by blacklisted without any notice."""
 )
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
 app.add_middleware(SentryMiddleware)
