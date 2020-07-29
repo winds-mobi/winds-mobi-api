@@ -14,7 +14,7 @@ sentry-asgi = "==0.2.0"
 sentry-sdk = "==0.9.5"
 stop-words = "==2018.7.23"
 ujson = "==1.35"
-uvicorn = "==0.7.0"
+uvicorn = "==0.11.7"
 
 [dev-packages]
 "flake8" = "==3.7.7"
