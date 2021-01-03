@@ -40,7 +40,7 @@ that publicly identifies you.
 
 Any IP that doesn't respect these rules could by blacklisted without any notice.
 
-Thanks,
+Thanks,  
 yann@winds.mobi
 """
 )
