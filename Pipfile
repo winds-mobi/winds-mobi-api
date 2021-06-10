@@ -5,7 +5,7 @@ verify_ssl = true
 
 [packages]
 aiocache = "==0.10.1"
-fastapi = "==0.35.0"
+fastapi = "==0.65.2"
 motor = "==2.0"
 parse-accept-language = "==0.1.2"
 pyaml = "==19.4.1"
