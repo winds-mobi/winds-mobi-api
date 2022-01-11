@@ -123,7 +123,7 @@ async def find_stations(
             description='List of keys to return'),
         provider: str = Query(
             None,
-            description='Returns only stations of the given provider'),
+            description='Returns only stations of the given provider. Limit is not enforced'),
         search: str = Query(
             None, description='String to search (ignoring accent)'),
         search_language: str = Query(
