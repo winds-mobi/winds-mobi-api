@@ -30,18 +30,27 @@ app = FastAPI(
     version='2.2',
     openapi_prefix=OPENAPI_PREFIX,
     docs_url=f'/{DOC_PATH}',
-    description="""### Welcome to winds.mobi API
-Feel free to use this API. The data indexed by winds.mobi are kindly shared by their providers and belong to them. 
-Do not try to monetize your service that is using this API data in any way: paid application, in-app purchase, 
-advertisement, ...
+    description="""### Feel free to "fair use" this API
+The data indexed by winds.mobi are kindly shared by their providers and belong to them.
 
-Don't overload winds.mobi by caching the data on your side and please use an IP address with a reverse DNS (PTR record) 
-that publicly identifies you.
+1. Don't try to monetize your service that is using winds.mobi data in any way: paid application, subscription, 
+in-app purchase, advertisement, ...
 
-Any IP that doesn't respect these rules could by blacklisted without any notice.
+2. Don't overload this server by minimizing your number of calls:
+- get data for multiple stations at once
+- use cache in your backend application
 
-Thanks,  
-yann@winds.mobi
+3. Always publicly identify your calls to winds.mobi by doing at least one of the following:
+- use an IP address with a `reverse DNS` (PTR record) to identify your backend application
+- set an HTTP header `user-agent` to identify your backend application
+- set an HTTP header `referer` (most browsers are doing it by default) to identify your web application
+
+Any IP or application that doesn't respect these rules could be blacklisted without any notice.
+
+Thanks!
+
+Yann  
+info@winds.mobi
 """
 )
 app.add_middleware(CORSMiddleware, allow_origins=['*'])
