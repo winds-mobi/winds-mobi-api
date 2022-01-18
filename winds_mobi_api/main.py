@@ -30,8 +30,9 @@ app = FastAPI(
     version='2.2',
     openapi_prefix=OPENAPI_PREFIX,
     docs_url=f'/{DOC_PATH}',
-    description="""### Feel free to "fair use" this API
-The data indexed by winds.mobi are kindly shared by their providers and belong to them.
+    description="""### Feel free to "fair use" this API    
+Winds.mobi is a free, community [open source](https://github.com/winds-mobi) project. The data indexed by winds.mobi 
+are kindly shared by their providers and belong to them.
 
 1. Don't try to monetize your service that is using winds.mobi data in any way: paid application, subscription, 
 in-app purchase, advertisement, ...
