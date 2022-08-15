@@ -1,8 +1,8 @@
 winds.mobi - real-time weather observations
 ===========================================
 
-[![Follow us on https://www.facebook.com/WindsMobi/](https://img.shields.io/badge/facebook-follow_us-blue)](https://www.facebook.com/WindsMobi/)
-[![Uptime https://status.winds.mobi/](https://img.shields.io/uptimerobot/ratio/m783264581-61aa86de256a62e17ec4b862?label=API%202.2)](https://status.winds.mobi/)
+[![Follow us](https://img.shields.io/badge/facebook-follow_us-blue)](https://www.facebook.com/WindsMobi/)
+[![Uptime](https://img.shields.io/uptimerobot/ratio/m783264581-61aa86de256a62e17ec4b862?label=API%202.2)](https://stats.uptimerobot.com/O7N31cA8n)
 
 [winds.mobi](http://winds.mobi): Paraglider pilot, kitesurfer, check real-time weather conditions of your favorite spots
 on your smartphone, your tablet or your computer.
