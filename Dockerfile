@@ -1,18 +1,28 @@
-FROM python:3.7-slim-stretch
+FROM python:3.7.13-slim-buster AS base
 
-RUN apt-get update; \
-apt-get --yes --no-install-recommends install build-essential python-scipy; \
-rm -rf /var/lib/apt/lists/*
+ENV LANG C.UTF-8
+ENV LC_ALL C.UTF-8
 
-ADD . /app
-WORKDIR /app
+RUN apt update; \
+    apt --yes --no-install-recommends install python-scipy
 
-RUN pip install pipenv
-RUN pipenv install --system --deploy
+FROM base AS python
 
-RUN apt-get --yes --purge autoremove build-essential
+RUN apt update; \
+    apt --yes --no-install-recommends install build-essential curl
+RUN curl -sSL https://install.python-poetry.org | python3 - --version 1.1.14
 
-EXPOSE 8000
+COPY . .
+RUN POETRY_VIRTUALENVS_IN_PROJECT=true /root/.local/bin/poetry install --no-dev
 
-COPY docker-cmd.sh .
-CMD ["./docker-cmd.sh"]
+FROM base AS runtime
+
+ENV PATH="/.venv/bin:$PATH"
+
+COPY . .
+
+FROM runtime AS production
+
+COPY --from=python /.venv /.venv
+
+CMD ["/docker-cmd.sh"]

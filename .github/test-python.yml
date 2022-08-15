@@ -1,0 +1,8 @@
+name: Test project
+on: [ push, pull_request ]
+
+jobs:
+  test-python:
+    uses: winds-mobi/winds-mobi-cicd/.github/workflows/test-python.yml@main
+    with:
+      python_version: 3.7.13

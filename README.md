@@ -12,7 +12,7 @@ on your smartphone, your tablet or your computer.
 winds-mobi-api
 --------------------
 
-Python 3.7 standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
+Python standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
 
 Deployed API versions:
 - [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc) (**latest**)

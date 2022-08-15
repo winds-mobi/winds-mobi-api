@@ -1,4 +1,4 @@
-from locust import HttpLocust, TaskSet
+from locust import HttpUser, TaskSet
 
 
 def find_stations_list(l):
@@ -22,7 +22,7 @@ class UserBehavior(TaskSet):
     tasks = {find_stations_list: 2, find_stations_map: 1, get_station: 5, get_station_historic: 1}
 
 
-class WebsiteUser(HttpLocust):
+class WebsiteUser(HttpUser):
     task_set = UserBehavior
     min_wait = 0
     max_wait = 0
