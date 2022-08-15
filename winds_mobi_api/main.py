@@ -1,6 +1,7 @@
 import asyncio
-import logging.config
-from os import path
+import logging
+from logging.config import dictConfig
+from pathlib import Path
 
 import pymongo
 import sentry_sdk
@@ -16,8 +17,10 @@ from starlette.responses import JSONResponse, RedirectResponse
 from winds_mobi_api import database, views
 from winds_mobi_api.settings import settings
 
-with open(path.join(path.dirname(path.abspath(__file__)), "logging.yaml")) as f:
-    logging.config.dictConfig(yaml.load(f, Loader=yaml.FullLoader))
+HERE = Path(__file__).parents[0]
+
+with open(Path(HERE, "logging.yaml"), "r") as file:
+    dictConfig(yaml.load(file, Loader=yaml.FullLoader))
 sentry_sdk.init(settings.sentry_dsn, environment=settings.environment)
 
 log = logging.getLogger(__name__)
@@ -47,9 +50,9 @@ in-app purchase, advertisement, ...
 
 Any IP or application that doesn't respect these rules could be blacklisted without any notice.
 
-Thanks!
+Enjoy!
 
-Yann  
+Yann
 info@winds.mobi
 """,  # noqa: W291
 )

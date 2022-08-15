@@ -214,13 +214,11 @@ async def find_stations(
             {"status": {"$ne": "hidden"}, "last._id": {"$gt": now - 30 * 24 * 3600}}
         )
 
-        def get_cluster_query(no_cluster):
-            cluster_query = query.copy()
-            cluster_query["clusters"] = {"$elemMatch": {"$lte": int(no_cluster)}}
-            return cluster_query
+        def get_cluster_query(cluster):
+            return {**query, "clusters": {"$elemMatch": {"$lte": int(cluster)}}}
 
         def count(x):
-            y = database.mongodb_sync().stations.count(get_cluster_query(x))
+            y = database.mongodb_sync().stations.count_documents(get_cluster_query(x))
             return y - limit
 
         def no_cluster_task():
