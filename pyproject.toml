@@ -26,6 +26,7 @@ uvicorn = "0.7.0"
 [tool.poetry.dev-dependencies]
 black = "21.12b0"
 flake8 = "5.0.4"
+isort = "5.10.1"
 locust = "latest"
 pytest = "7.1.2"
 python-dotenv = "latest"
@@ -36,5 +37,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-force-exclude = '''
-'''
+
+[tool.isort]
+profile = "black"
+line_length = 120

@@ -1,11 +1,11 @@
 # coding=utf-8
 
-diacritics = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ'
-asciis = 'SOZsozYYuAAAAAAACEEEEIIIIDNOOOOOOUUUUYsaaaaaaaceeeeiiiionoooooouuuuyy'
+diacritics = "ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýÿ"
+asciis = "SOZsozYYuAAAAAAACEEEEIIIIDNOOOOOOUUUUYsaaaaaaaceeeeiiiionoooooouuuuyy"
 
 
 def normalize(str):
-    new_str = ''
+    new_str = ""
     for char in str:
         new_char = char
         for i, diacritic in enumerate(diacritics):
@@ -18,18 +18,18 @@ def normalize(str):
 
 
 def create_regexp(str):
-    reg_exp = ''
+    reg_exp = ""
     for char in str:
         found = False
         for i, ascii in enumerate(asciis):
             if char == ascii:
                 if not found:
-                    reg_exp += '['
+                    reg_exp += "["
                     found = True
                 reg_exp += diacritics[i]
 
         reg_exp += char
         if found:
-            reg_exp += ']'
+            reg_exp += "]"
 
     return reg_exp
