@@ -45,12 +45,9 @@ def generate_box_geometry(sw, ne):
     coordinates.append(sw)
 
     return {
-        'type': 'Polygon',
-        'coordinates': [coordinates],
+        "type": "Polygon",
+        "coordinates": [coordinates],
         # Resolves "Big polygon" issue, requires mongodb 3.x
         # http://docs.mongodb.org/manual/reference/operator/query/geometry/#op._S_geometry
-        'crs': {
-            'type': 'name',
-            'properties': {'name': 'urn:x-mongodb:crs:strictwinding:EPSG:4326'}
-        }
+        "crs": {"type": "name", "properties": {"name": "urn:x-mongodb:crs:strictwinding:EPSG:4326"}},
     }

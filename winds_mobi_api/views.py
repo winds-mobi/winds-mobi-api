@@ -5,15 +5,22 @@ from typing import List, Union
 
 import pymongo
 from aiocache import cached
-from fastapi import HTTPException, Path, Query, Header, APIRouter
+from fastapi import APIRouter, Header, HTTPException, Path, Query
 from scipy import optimize
 from starlette.responses import JSONResponse
-from stop_words import get_stop_words, StopWordError
+from stop_words import StopWordError, get_stop_words
 
-from winds_mobi_api import diacritics, database
+from winds_mobi_api import database, diacritics
 from winds_mobi_api.language import negotiate_language
-from winds_mobi_api.models import (Station, StationKey, Measure, MeasureKey, station_key_defaults, measure_key_defaults,
-                                   Status)
+from winds_mobi_api.models import (
+    Measure,
+    MeasureKey,
+    Station,
+    StationKey,
+    Status,
+    measure_key_defaults,
+    station_key_defaults,
+)
 from winds_mobi_api.mongo_utils import generate_box_geometry
 
 log = logging.getLogger(__name__)
@@ -33,64 +40,42 @@ def response(data):
         return JSONResponse(data, 200)
 
 
-error_detail_doc = {
-    'application/json': {
-        'schema': {
-            'type': 'object',
-            'properties': {
-                'detail': {
-                    'type': 'string'
-                }
-            }
-        }
-    }
-}
+error_detail_doc = {"application/json": {"schema": {"type": "object", "properties": {"detail": {"type": "string"}}}}}
 
 
 @router.get(
-    '/stations/{station_id}/',
+    "/stations/{station_id}/",
     status_code=200,
     response_model=Station,
-    summary='Get a station',
-    description='''
+    summary="Get a station",
+    description="""
 Example:
 - Mauborget: [stations/jdc-1001](stations/jdc-1001)
-''',  # noqa
-    responses={
-        404: {
-            'description': 'Station not found',
-            'content': {
-                **error_detail_doc
-            }
-        }
-    }
+""",  # noqa
+    responses={404: {"description": "Station not found", "content": {**error_detail_doc}}},
 )
 async def get_station(
-        station_id: str = Path(
-            ...,
-            description='The station ID to request'),
-        keys: List[StationKey] = Query(
-            station_key_defaults,
-            description='List of keys to return'),
+    station_id: str = Path(..., description="The station ID to request"),
+    keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
 ):
     projection_dict = {}
     for key in keys:
         projection_dict[key.value] = 1
     # last._id should be always returned
-    projection_dict['last._id'] = 1
+    projection_dict["last._id"] = 1
 
-    station = await database.mongodb().stations.find_one({'_id': station_id}, projection_dict)
+    station = await database.mongodb().stations.find_one({"_id": station_id}, projection_dict)
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
     return response(station)
 
 
 @router.get(
-    '/stations/',
+    "/stations/",
     status_code=200,
     response_model=List[Station],
-    summary='Search for stations',
-    description='''
+    summary="Search for stations",
+    description="""
 Examples:
 - Get 5 stations from jdc.ch: [stations/?limit=5&provider=jdc](stations/?limit=5&provider=jdc)
 - Search (ignore accents): [stations/?search=dole](stations/?search=dole)
@@ -98,72 +83,51 @@ Examples:
 - Search 20 km around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
 - Return jdc-1001 and jdc-1002: [stations/?ids=jdc-1001&ids=jdc-1002](stations/?ids=jdc-1001&ids=jdc-1002)
 - Search for 3 working mountain stations that have measures more recent than 1 hour: [stations/?status=green&limit=3&is-peak=true&last-measure=3600](stations/?status=green&limit=3&is-peak=true&last-measure=3600)
-''',  # noqa
+""",  # noqa
     responses={
-        400: {
-            'description': 'Bad request',
-            'content': {
-                **error_detail_doc
-            }
-        },
-        404: {
-            'description': 'Station not found',
-            'content': {
-                **error_detail_doc
-            }
-        }
-    }
+        400: {"description": "Bad request", "content": {**error_detail_doc}},
+        404: {"description": "Station not found", "content": {**error_detail_doc}},
+    },
 )
 async def find_stations(
-        request_limit: int = Query(
-            20, alias='limit',
-            description='Nb stations to return (max=500)'),
-        keys: List[StationKey] = Query(
-            station_key_defaults,
-            description='List of keys to return'),
-        provider: str = Query(
-            None,
-            description='Returns only stations of the given provider. Limit is not enforced'),
-        search: str = Query(
-            None, description='String to search (ignoring accent)'),
-        search_language: str = Query(
-            None, alias='search-language',
-            description="Language of the search. Default to request language or 'en'"),
-        near_latitude: float = Query(
-            None, alias='near-lat',
-            description='Geo search near: latitude ie 46.78'),
-        near_longitude: float = Query(
-            None, alias='near-lon',
-            description='Geo search near: longitude ie 6.63'),
-        near_distance: int = Query(
-            None, alias='near-distance',
-            description='Geo search near: distance from lat,lon [meters]'),
-        within_pt1_latitude: float = Query(
-            None, alias='within-pt1-lat',
-            description='Geo search within rectangle: pt1 latitude'),
-        within_pt1_longitude: float = Query(
-            None, alias='within-pt1-lon',
-            description='Geo search within rectangle: pt1 longitude'),
-        within_pt2_latitude: float = Query(
-            None, alias='within-pt2-lat',
-            description='Geo search within rectangle: pt2 latitude'),
-        within_pt2_longitude: float = Query(
-            None, alias='within-pt2-lon',
-            description='Geo search within rectangle: pt2 longitude'),
-        is_peak: bool = Query(
-            None, alias='is-peak',
-            description='Return only the stations that are located on top of a peak'),
-        status: Status = Query(
-            None,
-            description="Return only the stations with the given status: 'green', 'orange' or 'red'"),
-        last_measure: Union[int, datetime] = Query(
-            None, alias='last-measure',
-            description='Return only the stations with a measure more recent that {last-measure}. '
-                        'Can be a duration in seconds or a absolute datetime, for example: 2019-08-16 15:30'),
-        ids: List[str] = Query(
-            None,
-            description='Returns stations by ids'),
-        accept_language: str = Header(None)
+    request_limit: int = Query(20, alias="limit", description="Nb stations to return (max=500)"),
+    keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
+    provider: str = Query(None, description="Returns only stations of the given provider. Limit is not enforced"),
+    search: str = Query(None, description="String to search (ignoring accent)"),
+    search_language: str = Query(
+        None, alias="search-language", description="Language of the search. Default to request language or 'en'"
+    ),
+    near_latitude: float = Query(None, alias="near-lat", description="Geo search near: latitude ie 46.78"),
+    near_longitude: float = Query(None, alias="near-lon", description="Geo search near: longitude ie 6.63"),
+    near_distance: int = Query(
+        None, alias="near-distance", description="Geo search near: distance from lat,lon [meters]"
+    ),
+    within_pt1_latitude: float = Query(
+        None, alias="within-pt1-lat", description="Geo search within rectangle: pt1 latitude"
+    ),
+    within_pt1_longitude: float = Query(
+        None, alias="within-pt1-lon", description="Geo search within rectangle: pt1 longitude"
+    ),
+    within_pt2_latitude: float = Query(
+        None, alias="within-pt2-lat", description="Geo search within rectangle: pt2 latitude"
+    ),
+    within_pt2_longitude: float = Query(
+        None, alias="within-pt2-lon", description="Geo search within rectangle: pt2 longitude"
+    ),
+    is_peak: bool = Query(
+        None, alias="is-peak", description="Return only the stations that are located on top of a peak"
+    ),
+    status: Status = Query(
+        None, description="Return only the stations with the given status: 'green', 'orange' or 'red'"
+    ),
+    last_measure: Union[int, datetime] = Query(
+        None,
+        alias="last-measure",
+        description="Return only the stations with a measure more recent that {last-measure}. "
+        "Can be a duration in seconds or a absolute datetime, for example: 2019-08-16 15:30",
+    ),
+    ids: List[str] = Query(None, description="Returns stations by ids"),
+    accept_language: str = Header(None),
 ):
     if 1 <= request_limit <= 500:
         limit = request_limit
@@ -175,42 +139,39 @@ async def find_stations(
     for key in keys:
         projection_dict[key.value] = 1
     # last._id should be always returned
-    projection_dict['last._id'] = 1
+    projection_dict["last._id"] = 1
 
     now = datetime.now().timestamp()
-    query = {
-        'status': {'$ne': 'hidden'},
-        'last._id': {'$gt': now - 30 * 24 * 3600}
-    }
+    query = {"status": {"$ne": "hidden"}, "last._id": {"$gt": now - 30 * 24 * 3600}}
 
     if provider:
         use_limit = False
-        query['pv-code'] = provider
+        query["pv-code"] = provider
 
     if search:
         use_limit = True
         if not search_language:
-            search_language = negotiate_language(accept_language, default='en')
+            search_language = negotiate_language(accept_language, default="en")
         try:
             stop_words = get_stop_words(search_language)
         except StopWordError:
-            stop_words = get_stop_words('en')
+            stop_words = get_stop_words("en")
 
         or_queries = []
         for word in search.split():
             if word not in stop_words:
                 regexp_query = diacritics.create_regexp(diacritics.normalize(word))
-                or_queries.append({'name': {'$regex': regexp_query, '$options': 'i'}})
-                or_queries.append({'short': {'$regex': regexp_query, '$options': 'i'}})
+                or_queries.append({"name": {"$regex": regexp_query, "$options": "i"}})
+                or_queries.append({"short": {"$regex": regexp_query, "$options": "i"}})
 
         if or_queries:
-            query['$or'] = or_queries
+            query["$or"] = or_queries
 
     if is_peak is not None:
-        query['peak'] = {'$eq': is_peak}
+        query["peak"] = {"$eq": is_peak}
 
     if status is not None:
-        query['status'] = {'$eq': status}
+        query["status"] = {"$eq": status}
 
     if last_measure is not None:
         timestamp = None
@@ -219,28 +180,18 @@ async def find_stations(
         elif isinstance(last_measure, datetime):
             timestamp = last_measure.timestamp()
         if timestamp:
-            query['last._id'] = {'$gte': int(timestamp)}
+            query["last._id"] = {"$gte": int(timestamp)}
 
     if near_latitude and near_longitude:
         if near_distance:
-            query['loc'] = {
-                '$near': {
-                    '$geometry': {
-                        'type': 'Point',
-                        'coordinates': [near_longitude, near_latitude]
-                    },
-                    '$maxDistance': near_distance
+            query["loc"] = {
+                "$near": {
+                    "$geometry": {"type": "Point", "coordinates": [near_longitude, near_latitude]},
+                    "$maxDistance": near_distance,
                 }
             }
         else:
-            query['loc'] = {
-                '$near': {
-                    '$geometry': {
-                        'type': 'Point',
-                        'coordinates': [near_longitude, near_latitude]
-                    }
-                }
-            }
+            query["loc"] = {"$near": {"$geometry": {"type": "Point", "coordinates": [near_longitude, near_latitude]}}}
         # $near results are already sorted: return now
         cursor = database.mongodb().stations.find(query, projection_dict).limit(limit)
         return response(await cursor.to_list(None))
@@ -250,22 +201,22 @@ async def find_stations(
             # Empty box
             return response([])
 
-        query['loc'] = {
-            '$geoWithin': {
-                '$geometry': generate_box_geometry((within_pt2_longitude, within_pt2_latitude),
-                                                   (within_pt1_longitude, within_pt1_latitude))
+        query["loc"] = {
+            "$geoWithin": {
+                "$geometry": generate_box_geometry(
+                    (within_pt2_longitude, within_pt2_latitude), (within_pt1_longitude, within_pt1_latitude)
+                )
             }
         }
 
         now = datetime.now().timestamp()
-        nb_stations = await database.mongodb().stations.count_documents({
-            'status': {'$ne': 'hidden'},
-            'last._id': {'$gt': now - 30 * 24 * 3600}
-        })
+        nb_stations = await database.mongodb().stations.count_documents(
+            {"status": {"$ne": "hidden"}, "last._id": {"$gt": now - 30 * 24 * 3600}}
+        )
 
         def get_cluster_query(no_cluster):
             cluster_query = query.copy()
-            cluster_query['clusters'] = {'$elemMatch': {'$lte': int(no_cluster)}}
+            cluster_query["clusters"] = {"$elemMatch": {"$lte": int(no_cluster)}}
             return cluster_query
 
         def count(x):
@@ -284,21 +235,21 @@ async def find_stations(
         if no_cluster:
             cursor = database.mongodb().stations.find(get_cluster_query(no_cluster), projection_dict)
             stations = await cursor.to_list(None)
-            log.debug(f'limit={limit}, no_cluster={no_cluster:.0f} => {len(stations)}')
+            log.debug(f"limit={limit}, no_cluster={no_cluster:.0f} => {len(stations)}")
         else:
             cursor = database.mongodb().stations.find(query, projection_dict)
             stations = await cursor.to_list(None)
-            log.debug(f'limit={limit} => {len(stations)}')
+            log.debug(f"limit={limit} => {len(stations)}")
         return response(stations)
 
     if ids:
-        query['_id'] = {'$in': ids}
+        query["_id"] = {"$in": ids}
         cursor = database.mongodb().stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
-        stations.sort(key=lambda station: ids.index(station['_id']))
+        stations.sort(key=lambda station: ids.index(station["_id"]))
         return response(stations)
 
-    cursor = database.mongodb().stations.find(query, projection_dict).sort('short', pymongo.ASCENDING)
+    cursor = database.mongodb().stations.find(query, projection_dict).sort("short", pymongo.ASCENDING)
     if use_limit:
         cursor.limit(limit)
     elif request_limit >= 1:
@@ -307,55 +258,40 @@ async def find_stations(
 
 
 @router.get(
-    '/stations/{station_id}/historic/',
+    "/stations/{station_id}/historic/",
     status_code=200,
     response_model=List[Measure],
-    summary='Get historic data for a station since a duration',
-    description='''
+    summary="Get historic data for a station since a duration",
+    description="""
 Example:
 
 - Historic Mauborget (1 hour): [stations/jdc-1001/historic/?duration=3600](stations/jdc-1001/historic/?duration=3600)
-''',  # noqa
+""",  # noqa
     responses={
-        400: {
-            'description': 'Bad request',
-            'content': {
-                **error_detail_doc
-            }
-        },
-        404: {
-            'description': 'Station not found',
-            'content': {
-                **error_detail_doc
-            }
-        }
-    }
+        400: {"description": "Bad request", "content": {**error_detail_doc}},
+        404: {"description": "Station not found", "content": {**error_detail_doc}},
+    },
 )
 async def get_station_historic(
-        station_id: str = Path(
-            ...,
-            description='The station ID to request'),
-        duration: int = Query(
-            3600,
-            description='Historic duration'),
-        keys: List[MeasureKey] = Query(
-            measure_key_defaults, description='List of keys to return')
+    station_id: str = Path(..., description="The station ID to request"),
+    duration: int = Query(3600, description="Historic duration"),
+    keys: List[MeasureKey] = Query(measure_key_defaults, description="List of keys to return"),
 ):
     projection_dict = {}
     for key in keys:
         projection_dict[key.value] = 1
 
     if duration > 7 * 24 * 3600:
-        raise HTTPException(status_code=400, detail='Duration > 7 days')
+        raise HTTPException(status_code=400, detail="Duration > 7 days")
 
-    station = await database.mongodb().stations.find_one({'_id': station_id})
+    station = await database.mongodb().stations.find_one({"_id": station_id})
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
 
-    if 'last' not in station or station_id not in await get_collection_names():
+    if "last" not in station or station_id not in await get_collection_names():
         raise HTTPException(status_code=404, detail=f"No historic data for station id '{station_id}'")
-    last_time = station['last']['_id']
+    last_time = station["last"]["_id"]
     start_time = last_time - duration
-    nb_data = await database.mongodb()[station_id].count_documents({'_id': {'$gte': start_time}}) + 1
-    cursor = database.mongodb()[station_id].find({}, projection_dict, sort=(('_id', -1),)).limit(nb_data)
+    nb_data = await database.mongodb()[station_id].count_documents({"_id": {"$gte": start_time}}) + 1
+    cursor = database.mongodb()[station_id].find({}, projection_dict, sort=(("_id", -1),)).limit(nb_data)
     return response(await cursor.to_list(None))
