@@ -276,7 +276,7 @@ async def find_stations(
             return optimize.brentq(count, 1, nb_stations, maxiter=2, disp=False)
 
         try:
-            # CPU an IO bound task using a sync library: executing it in a separated thread to not block the event loop
+            # CPU and IO bound task using a sync library: executing it in a separated thread to not block the event loop
             no_cluster = await asyncio.get_running_loop().run_in_executor(None, no_cluster_task)
         except ValueError:
             no_cluster = None
