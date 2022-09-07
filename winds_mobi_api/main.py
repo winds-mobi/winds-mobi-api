@@ -29,7 +29,7 @@ asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
 app = FastAPI(
     title="winds.mobi",
-    version="2.2",
+    version="2.3",
     openapi_prefix=settings.openapi_prefix,
     docs_url=f"/{settings.doc_path}",
     description="""### Feel free to "fair use" this API

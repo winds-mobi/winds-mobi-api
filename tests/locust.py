@@ -1,4 +1,4 @@
-from locust import HttpUser, TaskSet
+from locust import HttpUser
 
 
 def find_stations_list(user):
@@ -13,18 +13,14 @@ def find_stations_map(user):
 
 
 def get_station(user):
-    user.client.get("/stations/windline-4107")
+    user.client.get("/stations/holfuy-1636/")
 
 
 def get_station_historic(user):
-    user.client.get("/stations/windline-4107/historic")
-
-
-class UserBehavior(TaskSet):
-    tasks = {find_stations_list: 2, find_stations_map: 1, get_station: 5, get_station_historic: 1}
+    user.client.get("/stations/holfuy-1636/historic/")
 
 
 class WebsiteUser(HttpUser):
-    task_set = UserBehavior
+    tasks = {find_stations_list: 2, find_stations_map: 1, get_station: 5, get_station_historic: 1}
     min_wait = 0
     max_wait = 0
