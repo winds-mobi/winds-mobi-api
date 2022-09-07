@@ -4,7 +4,7 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
 RUN apt update; \
-    apt --yes --no-install-recommends install python-scipy
+    apt --yes --no-install-recommends install python3-scipy
 
 FROM base AS python
 
