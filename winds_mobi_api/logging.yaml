@@ -9,6 +9,9 @@ handlers:
     class: logging.StreamHandler
     formatter: console
     stream: ext://sys.stdout
+loggers:
+  uvicorn:
+    level: INFO
 root:
-  handlers: [console]
+  handlers: [ console ]
   level: INFO
