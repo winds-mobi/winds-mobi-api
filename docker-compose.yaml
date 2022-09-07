@@ -10,8 +10,8 @@ services:
       - "8001:8000"
     environment:
       PORT: 8000
-      APP_MONGODB_URL: ${MONGODB_URL}
-      APP_OPENAPI_PREFIX: ${OPENAPI_PREFIX}
+      MONGODB_URL: ${MONGODB_URL}
+      OPENAPI_PREFIX: ${OPENAPI_PREFIX}
     networks:
       - winds-mobi-providers
 

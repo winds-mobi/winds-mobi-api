@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Dict, List
 
-from pydantic import BaseModel, Schema
+from pydantic import BaseModel, Field
 
 
 class Status(str, Enum):
@@ -12,28 +12,28 @@ class Status(str, Enum):
 
 
 class Location(BaseModel):
-    type: str = Schema("Point", title="Type", description="GeoJSON type")
-    coordinates: List[float] = Schema(None, title="Coordinates", description="longitude, latitude")
+    type: str = Field("Point", title="Type", description="GeoJSON type")
+    coordinates: List[float] = Field(None, title="Coordinates", description="longitude, latitude")
 
 
 class Pressure(BaseModel):
-    qfe: float = Schema(..., title="QFE", description="QFE [hPa]")
-    qnh: float = Schema(..., title="QNH", description="QNH [hPa]")
-    qff: float = Schema(..., title="QFF", description="QFF [hPa]")
+    qfe: float = Field(..., title="QFE", description="QFE [hPa]")
+    qnh: float = Field(..., title="QNH", description="QNH [hPa]")
+    qff: float = Field(..., title="QFF", description="QFF [hPa]")
 
 
 class Measure(BaseModel):
     class Config:
         json_encoders = {datetime: lambda d: d.timestamp()}
 
-    id: int = Schema(..., alias="_id", title="_ID", description="Measure date [unix timestamp]", example=1565722207)
-    w_dir: int = Schema(None, alias="w-dir", title="Wind direction", description="Wind direction [°] (0-359)")
-    w_avg: float = Schema(None, alias="w-avg", title="Wind average", description="Wind speed [km/h]")
-    w_max: float = Schema(None, alias="w-max", title="Wind max", description="Wind speed max [km/h]")
-    temp: float = Schema(None, title="Temperature", description="Temperature [°C]")
-    hum: float = Schema(None, title="Humidity", description="Air humidity [%rH]")
-    rain: float = Schema(None, title="Rain", description="Rain [l/m²]")
-    pres: Pressure = Schema(None, title="Pressure", description="Air pressure")
+    id: int = Field(..., alias="_id", title="_ID", description="Measure date [unix timestamp]", example=1565722207)
+    w_dir: int = Field(None, alias="w-dir", title="Wind direction", description="Wind direction [°] (0-359)")
+    w_avg: float = Field(None, alias="w-avg", title="Wind average", description="Wind speed [km/h]")
+    w_max: float = Field(None, alias="w-max", title="Wind max", description="Wind speed max [km/h]")
+    temp: float = Field(None, title="Temperature", description="Temperature [°C]")
+    hum: float = Field(None, title="Humidity", description="Air humidity [%rH]")
+    rain: float = Field(None, title="Rain", description="Rain [l/m²]")
+    pres: Pressure = Field(None, title="Pressure", description="Air pressure")
 
 
 class MeasureKey(str, Enum):
@@ -63,27 +63,27 @@ class Station(BaseModel):
     class Config:
         json_encoders = {datetime: lambda d: d.timestamp()}
 
-    id: str = Schema(..., alias="_id", title="_ID", description="Station ID {pv-code}-{pv-id}, example: jdc-1010")
-    pv_id: str = Schema(
+    id: str = Field(..., alias="_id", title="_ID", description="Station ID {pv-code}-{pv-id}, example: jdc-1010")
+    pv_id: str = Field(
         None, alias="pv-id", title="Provider ID", description="Station ID in provider space, example: 1010"
     )
-    pv_code: str = Schema(None, alias="pv-code", title="Provider code", description="Example: jdc")
-    pv_name: str = Schema(
+    pv_code: str = Field(None, alias="pv-code", title="Provider code", description="Example: jdc")
+    pv_name: str = Field(
         None, alias="pv-name", title="Provider name", description="Full provider name, example: jdc.ch"
     )
-    short: str = Schema(None, title="Short name", description="Short name of the station")
-    name: str = Schema(None, title="Name", description="Full name of the station")
-    alt: int = Schema(None, title="Altitude", description="Altitude [m]")
-    peak: bool = Schema(None, title="Peak", description="Is the station on a peak")
-    status: Status = Schema(
+    short: str = Field(None, title="Short name", description="Short name of the station")
+    name: str = Field(None, title="Name", description="Full name of the station")
+    alt: int = Field(None, title="Altitude", description="Altitude [m]")
+    peak: bool = Field(None, title="Peak", description="Is the station on a peak")
+    status: Status = Field(
         None,
         title="Status",
         description="green: station ok, orange: data might be inaccurate, red: station isn't working",
     )
-    tz: str = Schema(None, title="Timezone", description="Timezone, example: Europe/Zurich")
-    loc: Location = Schema(None, title="Location", description="Location [geoJSON point]")
-    last: Measure = Schema(None, title="Last measure", description="Last measurement values")
-    url: Dict[str, str] = Schema(
+    tz: str = Field(None, title="Timezone", description="Timezone, example: Europe/Zurich")
+    loc: Location = Field(None, title="Location", description="Location [geoJSON point]")
+    last: Measure = Field(None, title="Last measure", description="Last measurement values")
+    url: Dict[str, str] = Field(
         None,
         title="Provider urls",
         description="""Urls to the provider station per language. Example:
