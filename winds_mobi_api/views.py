@@ -6,6 +6,7 @@ from typing import List, Union
 import pymongo
 from aiocache import cached
 from fastapi import APIRouter, Header, HTTPException, Path, Query
+from fastapi.responses import ORJSONResponse
 from scipy import optimize
 from starlette.responses import JSONResponse
 from stop_words import StopWordError, get_stop_words
@@ -48,10 +49,11 @@ error_detail_doc = {"application/json": {"schema": {"type": "object", "propertie
     status_code=200,
     response_model=Station,
     summary="Get a station",
+    response_class=ORJSONResponse,
     description="""
 Example:
 - Mauborget: [stations/jdc-1001](stations/jdc-1001)
-""",  # noqa
+""",  # noqa: E501
     responses={404: {"description": "Station not found", "content": {**error_detail_doc}}},
 )
 async def get_station(
@@ -75,6 +77,7 @@ async def get_station(
     status_code=200,
     response_model=List[Station],
     summary="Search for stations",
+    response_class=ORJSONResponse,
     description="""
 Examples:
 - Get 5 stations from jdc.ch: [stations/?limit=5&provider=jdc](stations/?limit=5&provider=jdc)
@@ -83,7 +86,7 @@ Examples:
 - Search 20 km around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
 - Return jdc-1001 and jdc-1002: [stations/?ids=jdc-1001&ids=jdc-1002](stations/?ids=jdc-1001&ids=jdc-1002)
 - Search for 3 working mountain stations that have measures more recent than 1 hour: [stations/?status=green&limit=3&is-peak=true&last-measure=3600](stations/?status=green&limit=3&is-peak=true&last-measure=3600)
-""",  # noqa
+""",  # noqa: E501
     responses={
         400: {"description": "Bad request", "content": {**error_detail_doc}},
         404: {"description": "Station not found", "content": {**error_detail_doc}},
@@ -260,11 +263,12 @@ async def find_stations(
     status_code=200,
     response_model=List[Measure],
     summary="Get historic data for a station since a duration",
+    response_class=ORJSONResponse,
     description="""
 Example:
 
 - Historic Mauborget (1 hour): [stations/jdc-1001/historic/?duration=3600](stations/jdc-1001/historic/?duration=3600)
-""",  # noqa
+""",  # noqa: E501
     responses={
         400: {"description": "Bad request", "content": {**error_detail_doc}},
         404: {"description": "Station not found", "content": {**error_detail_doc}},

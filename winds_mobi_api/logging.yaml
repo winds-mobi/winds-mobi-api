@@ -10,7 +10,7 @@ handlers:
     formatter: console
     stream: ext://sys.stdout
 loggers:
-  uvicorn:
+  uvicorn.error:
     level: INFO
 root:
   handlers: [ console ]
