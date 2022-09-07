@@ -24,7 +24,7 @@ stop-words = "2018.7.23"
 ujson = "5.4.0" # Optional dependency used by aiocache
 uvicorn = {extras = ["standard"], version = "0.17.6"}
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "22.8.0"
 flake8 = "5.0.4"
 isort = "5.10.1"

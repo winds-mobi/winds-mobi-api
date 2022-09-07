@@ -10,10 +10,10 @@ FROM base AS python
 
 RUN apt update; \
     apt --yes --no-install-recommends install build-essential curl
-RUN curl -sSL https://install.python-poetry.org | python - --version 1.1.14
+RUN curl -sSL https://install.python-poetry.org | python - --version 1.2.0
 
 COPY . .
-RUN POETRY_VIRTUALENVS_IN_PROJECT=true /root/.local/bin/poetry install --no-dev
+RUN POETRY_VIRTUALENVS_IN_PROJECT=true /root/.local/bin/poetry install --without dev
 
 FROM base AS runtime
 
