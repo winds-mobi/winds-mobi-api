@@ -17,9 +17,9 @@ class Location(BaseModel):
 
 
 class Pressure(BaseModel):
-    qfe: float = Field(..., title="QFE", description="QFE [hPa]")
-    qnh: float = Field(..., title="QNH", description="QNH [hPa]")
-    qff: float = Field(..., title="QFF", description="QFF [hPa]")
+    qfe: float | None = Field(None, title="QFE", description="QFE [hPa]")
+    qnh: float | None = Field(None, title="QNH", description="QNH [hPa]")
+    qff: float | None = Field(None, title="QFF", description="QFF [hPa]")
 
 
 class Measure(BaseModel):
