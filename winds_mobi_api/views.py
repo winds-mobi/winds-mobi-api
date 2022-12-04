@@ -5,10 +5,9 @@ from typing import List, Union
 
 import pymongo
 from aiocache import cached
-from fastapi import APIRouter, Header, HTTPException, Path, Query
+from fastapi import APIRouter, HTTPException, Header, Path, Query
 from fastapi.responses import ORJSONResponse
 from scipy import optimize
-from starlette.responses import JSONResponse
 from stop_words import StopWordError, get_stop_words
 
 from winds_mobi_api import database, diacritics
@@ -23,9 +22,9 @@ from winds_mobi_api.models import (
     station_key_defaults,
 )
 from winds_mobi_api.mongo_utils import generate_box_geometry
+from winds_mobi_api.settings import settings
 
 log = logging.getLogger(__name__)
-response_validation = False
 router = APIRouter()
 
 
@@ -35,10 +34,10 @@ async def get_collection_names():
 
 
 def response(data):
-    if response_validation:
+    if settings.response_schema_validation:
         return data
     else:
-        return JSONResponse(data, 200)
+        return ORJSONResponse(data, 200)
 
 
 error_detail_doc = {"application/json": {"schema": {"type": "object", "properties": {"detail": {"type": "string"}}}}}

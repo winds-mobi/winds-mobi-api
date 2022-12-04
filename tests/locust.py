@@ -1,4 +1,4 @@
-from locust import HttpUser
+from locust import FastHttpUser
 
 
 def find_stations_list(user):
@@ -20,7 +20,7 @@ def get_station_historic(user):
     user.client.get("/stations/holfuy-1636/historic/")
 
 
-class WebsiteUser(HttpUser):
-    tasks = {find_stations_list: 2, find_stations_map: 1, get_station: 5, get_station_historic: 1}
+class ApiUser(FastHttpUser):
+    tasks = {find_stations_list: 1, find_stations_map: 1, get_station: 10, get_station_historic: 1}
     min_wait = 0
     max_wait = 0
