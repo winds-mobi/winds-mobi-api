@@ -5,7 +5,7 @@ from typing import List, Union
 
 import pymongo
 from aiocache import cached
-from fastapi import APIRouter, HTTPException, Header, Path, Query
+from fastapi import APIRouter, Header, HTTPException, Path, Query
 from fastapi.responses import ORJSONResponse
 from scipy import optimize
 from stop_words import StopWordError, get_stop_words
