@@ -12,9 +12,26 @@ services:
       PORT: 8000
       MONGODB_URL: ${MONGODB_URL}
       OPENAPI_PREFIX: ${OPENAPI_PREFIX}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4317
+      OTEL_SERVICE_NAME: winds-mobi-api
     networks:
+      - default
       - winds-mobi-providers
 
+  opentelemetry-collector:
+    image: otel/opentelemetry-collector-contrib
+    profiles:
+      - application
+    ports:
+      - "8002:4317"
+    volumes:
+      - ./opentelemetry/collector.yaml:/config.yaml
+    environment:
+      DATADOG_API_KEY: ${DATADOG_API_KEY}
+    command: "--config /config.yaml"
+
 networks:
+  default:
+    name: winds-mobi-api
   winds-mobi-providers:
     external: true
