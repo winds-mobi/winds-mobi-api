@@ -29,7 +29,7 @@ router = APIRouter()
 
 
 @cached(ttl=10 * 60)
-async def get_collection_names():
+async def get_collection_names(**cache_kwargs):
     return await database.mongodb().list_collection_names()
 
 
@@ -289,10 +289,9 @@ async def get_station_historic(
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
 
-    if "last" not in station or station_id not in await get_collection_names():
+    if "last" not in station or station_id not in await get_collection_names(aiocache_wait_for_write=False):
         raise HTTPException(status_code=404, detail=f"No historic data for station id '{station_id}'")
     last_time = station["last"]["_id"]
     start_time = last_time - duration
-    nb_data = await database.mongodb()[station_id].count_documents({"_id": {"$gte": start_time}}) + 1
-    cursor = database.mongodb()[station_id].find({}, projection_dict, sort=(("_id", -1),)).limit(nb_data)
+    cursor = database.mongodb()[station_id].find({"_id": {"$gte": start_time}}, projection_dict, sort=(("_id", -1),))
     return response(await cursor.to_list(None))
