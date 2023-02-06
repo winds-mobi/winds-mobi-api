@@ -51,7 +51,7 @@ error_detail_doc = {"application/json": {"schema": {"type": "object", "propertie
     response_class=ORJSONResponse,
     description="""
 Example:
-- Mauborget: [stations/jdc-1001](stations/jdc-1001)
+- Le Suchet: [stations/holfuy-1636](stations/holfuy-1636)
 """,  # noqa: E501
     responses={404: {"description": "Station not found", "content": {**error_detail_doc}}},
 )
@@ -79,11 +79,11 @@ async def get_station(
     response_class=ORJSONResponse,
     description="""
 Examples:
-- Get 5 stations from jdc.ch: [stations/?limit=5&provider=jdc](stations/?limit=5&provider=jdc)
+- Get 5 stations from holfuy.com: [stations/?limit=5&provider=holfuy](stations/?limit=5&provider=holfuy)
 - Search (ignore accents): [stations/?search=dole](stations/?search=dole)
 - Search for 3 stations around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&limit=3](stations/?near-lat=46.78&near-lon=6.63&limit=3)
 - Search 20 km around Yverdon: [stations/?near-lat=46.78&near-lon=6.63&near-distance=20000](stations/?near-lat=46.78&near-lon=6.63&near-distance=20000)
-- Return jdc-1001 and jdc-1002: [stations/?ids=jdc-1001&ids=jdc-1002](stations/?ids=jdc-1001&ids=jdc-1002)
+- Return holfuy-1636 and holfuy-1293: [stations/?ids=holfuy-1636&ids=holfuy-1293](stations/?ids=holfuy-1636&ids=holfuy-1293)
 - Search for 3 working mountain stations that have measures more recent than 1 hour: [stations/?status=green&limit=3&is-peak=true&last-measure=3600](stations/?status=green&limit=3&is-peak=true&last-measure=3600)
 """,  # noqa: E501
     responses={
@@ -266,7 +266,7 @@ async def find_stations(
     description="""
 Example:
 
-- Historic Mauborget (1 hour): [stations/jdc-1001/historic/?duration=3600](stations/jdc-1001/historic/?duration=3600)
+- Historic Le Suchet (1 hour): [stations/holfuy-1636/historic/?duration=3600](stations/holfuy-1636/historic/?duration=3600)
 """,  # noqa: E501
     responses={
         400: {"description": "Bad request", "content": {**error_detail_doc}},

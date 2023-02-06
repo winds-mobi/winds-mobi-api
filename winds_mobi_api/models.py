@@ -63,13 +63,13 @@ class Station(BaseModel):
     class Config:
         json_encoders = {datetime: lambda d: d.timestamp()}
 
-    id: str = Field(..., alias="_id", title="_ID", description="Station ID {pv-code}-{pv-id}, example: jdc-1010")
+    id: str = Field(..., alias="_id", title="_ID", description="Station ID {pv-code}-{pv-id}, example: holfuy-1636")
     pv_id: str = Field(
         None, alias="pv-id", title="Provider ID", description="Station ID in provider space, example: 1010"
     )
-    pv_code: str = Field(None, alias="pv-code", title="Provider code", description="Example: jdc")
+    pv_code: str = Field(None, alias="pv-code", title="Provider code", description="Example: holfuy")
     pv_name: str = Field(
-        None, alias="pv-name", title="Provider name", description="Full provider name, example: jdc.ch"
+        None, alias="pv-name", title="Provider name", description="Full provider name, example: holfuy.com"
     )
     short: str = Field(None, title="Short name", description="Short name of the station")
     name: str = Field(None, title="Name", description="Full name of the station")
