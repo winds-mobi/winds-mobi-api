@@ -24,7 +24,7 @@ pyaml = "21.10.1"
 pydantic = "1.10.2"
 scipy = "1.9.3"
 sentry-asgi = "0.2.0"
-sentry-sdk = "1.11.1"
+sentry-sdk = "1.14.0"
 stop-words = "2018.7.23"
 ujson = "5.6.0" # Optional dependency used by aiocache
 uvicorn = {extras = ["standard"], version = "0.20.0"}
