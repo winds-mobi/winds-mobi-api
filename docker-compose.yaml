@@ -19,7 +19,7 @@ services:
       - winds-mobi-providers
 
   opentelemetry-collector:
-    image: otel/opentelemetry-collector-contrib
+    image: otel/opentelemetry-collector-contrib:0.74.0
     profiles:
       - application
     ports:
@@ -27,7 +27,9 @@ services:
     volumes:
       - ./opentelemetry/collector.yaml:/config.yaml
     environment:
-      DATADOG_API_KEY: ${DATADOG_API_KEY}
+      ENVIRONMENT: local
+      SENTRY_URL: ${SENTRY_URL}
+      UPTRACE_URL: ${UPTRACE_URL}
     command: "--config /config.yaml"
 
 networks:

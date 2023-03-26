@@ -4,21 +4,45 @@ receivers:
       grpc:
 
 processors:
+  attributes/environment:
+    actions:
+      - key: deployment.environment
+        action: insert
+        value: ${ENVIRONMENT}
+  tail_sampling:
+    decision_wait: 10s
+    num_traces: 10000
+    expected_new_traces_per_sec: 10
+    policies:
+      [
+        {
+          name: errors-policy,
+          type: status_code,
+          status_code: { status_codes: [ ERROR ] },
+        },
+        {
+          name: randomized-policy,
+          type: probabilistic,
+          probabilistic: { sampling_percentage: 0.1 },
+        },
+      ]
   batch:
-    # Datadog APM Intake limit is 3.2MB. Let's make sure the batches do not go over that.
-    send_batch_max_size: 1000
-    send_batch_size: 100
+    send_batch_size: 10000
     timeout: 10s
 
 exporters:
-  datadog:
-    api:
-      site: datadoghq.eu
-      key: ${DATADOG_API_KEY}
+  sentry:
+    dsn: ${SENTRY_URL}
+    environment: ${ENVIRONMENT}
+    insecure_skip_verify: true
+  otlp/uptrace:
+    endpoint: otlp.uptrace.dev:4317
+    headers:
+      uptrace-dsn: ${UPTRACE_URL}
 
 service:
   pipelines:
     traces:
       receivers: [ otlp ]
-      exporters: [ datadog ]
-      processors: [ batch ]
+      processors: [ attributes/environment, tail_sampling, batch ]
+      exporters: [ sentry, otlp/uptrace ]
