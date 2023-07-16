@@ -198,7 +198,12 @@ async def find_stations(
         cursor = database.mongodb().stations.find(query, projection_dict).limit(limit)
         return response(await cursor.to_list(None))
 
-    if within_pt1_latitude and within_pt1_longitude and within_pt2_latitude and within_pt2_longitude:
+    if (
+        within_pt1_latitude is not None
+        and within_pt1_longitude is not None
+        and within_pt2_latitude is not None
+        and within_pt2_longitude is not None
+    ):
         if within_pt1_latitude == within_pt2_latitude and within_pt1_longitude == within_pt2_longitude:
             # Empty box
             return response([])
