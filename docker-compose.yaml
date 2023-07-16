@@ -5,7 +5,7 @@ services:
     build:
       context: .
     profiles:
-      - application
+      - api
     ports:
       - "8001:8000"
     environment:
@@ -21,7 +21,7 @@ services:
   opentelemetry-collector:
     image: otel/opentelemetry-collector-contrib:0.74.0
     profiles:
-      - application
+      - monitoring
     ports:
       - "8002:4317"
     volumes:

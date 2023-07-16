@@ -5,5 +5,5 @@ jobs:
   test-python:
     uses: winds-mobi/winds-mobi-cicd/.github/workflows/test-python.yaml@main
     with:
-      python_version: 3.11.1
-      poetry_version: 1.2.2
+      python_version: 3.11.4
+      poetry_version: 1.5.1

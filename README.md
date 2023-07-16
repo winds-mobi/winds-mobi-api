@@ -13,28 +13,36 @@ winds-mobi-api
 Python standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
 
 Deployed API versions:
-- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc) (**latest**)
-- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> latest version
+- [winds.mobi/api/2.3/](https://winds.mobi/api/2.3/doc)
+- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc)
+- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> 2.2
 
 OpenAPI documentation:
 - /doc
 - /redoc
 
-### Requirements
+### Dependencies
 
-- python >= 3.7
-- mongodb >= 3.0
+- python 3.11 and [poetry](https://python-poetry.org) 
+- mongodb 4.4
 
-See [settings.py](settings.py)
+### Run the project with docker compose (simple way)
 
-### Python environment
+Create a `.env` file from `.env.template` which will be read by docker compose:
 
-- `pipenv install`
-- `pipenv shell`
+Then start the api:
+
+- `docker compose --profile=api up --build`
+
+### Run the project locally on macOS
+
+- `poetry install`
 
 ### Run the server
 
-- `uvicorn winds_mobi_api.main:app`
+Create a `.env.localhost` file from `.env.localhost.template` which will be read by docker compose:
+
+- `dotenv -f .env.localhost run uvicorn --proxy-headers --root-path /api/2.3 --port 8001 winds_mobi_api.main:app`
 
 Version history
 ---------------
