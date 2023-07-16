@@ -47,7 +47,7 @@ Create a `.env.localhost` file from `.env.localhost.template` which will be read
 Version history
 ---------------
 
-See [CHANGELOG.md](CHANGELOG.md).
+See [GitHub releases](https://github.com/winds-mobi/winds-mobi-api/releases)
 
 Licensing
 ---------
