@@ -1,15 +1,8 @@
-winds.mobi - real-time weather observations
-===========================================
+winds-mobi-api
+==============
 
-[![Follow us](https://img.shields.io/badge/facebook-follow_us-blue)](https://www.facebook.com/WindsMobi/)
 [![Uptime](https://img.shields.io/uptimerobot/ratio/m792621614-9a09b39a1095a00ab7aac360?label=API%202.3)](https://stats.uptimerobot.com/O7N31cA8n)
 [![Uptime](https://img.shields.io/uptimerobot/ratio/m792621629-aaab2977ec491689ac7775c6?label=API%202.2)](https://stats.uptimerobot.com/O7N31cA8n)
-
-[winds.mobi](http://winds.mobi): Paraglider pilot, kitesurfer, check real-time weather conditions of your favorite spots
-on your smartphone, your tablet or your computer.
-
-winds-mobi-api
---------------------
 
 Python standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
 
@@ -22,35 +15,34 @@ OpenAPI documentation:
 - /doc
 - /redoc
 
+## Run the project with docker compose (simple way)
 ### Dependencies
+- [Docker](https://docs.docker.com/get-docker/)
 
-- python 3.11 and [poetry](https://python-poetry.org) 
-- mongodb 4.4
-
-### Run the project with docker compose (simple way)
-
-Create a `.env` file from `.env.template` which will be read by docker compose:
+Create an `.env` file from `.env.template` read by docker compose:
+- `cp .env.template .env`
 
 Then start the api:
+- `docker compose up --build`
+- stations list api endpoint: http://localhost:8001/stations/
 
-- `docker compose --profile=api up --build`
+## Run the project locally on macOS
+### Dependencies
+- Python 3.11
+- [Poetry](https://python-poetry.org)
 
-### Run the project locally on macOS
+Create an `.env.localhost` file from `.env.localhost.template` read by `dotenv` for our local commands:
+- `cp .env.localhost.template .env.localhost`
 
+### Create the python virtual environment and install dependencies
 - `poetry install`
 
+### Activate the python virtual environment
+- `poetry shell`
+
 ### Run the server
-
-Create a `.env.localhost` file from `.env.localhost.template` which will be read by docker compose:
-
 - `dotenv -f .env.localhost run uvicorn --proxy-headers --root-path /api/2.3 --port 8001 winds_mobi_api.main:app`
+- stations list api endpoint: http://localhost:8001/stations/
 
-Version history
----------------
-
-See [GitHub releases](https://github.com/winds-mobi/winds-mobi-api/releases)
-
-Licensing
----------
-
-See [LICENSE.txt](LICENSE.txt)
+## Licensing
+winds.mobi is licensed under the AGPL License, Version 3.0. See [LICENSE.txt](LICENSE.txt)

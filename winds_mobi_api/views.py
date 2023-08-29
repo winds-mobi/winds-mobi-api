@@ -94,7 +94,7 @@ Examples:
 async def find_stations(
     request_limit: int = Query(20, alias="limit", description="Nb stations to return (max=500)"),
     keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
-    provider: str = Query(None, description="Returns only stations of the given provider. Limit is not enforced"),
+    provider: str = Query(None, description="Returns only stations of the given provider id. Limit is not enforced"),
     search: str = Query(None, description="String to search (ignoring accent)"),
     search_language: str = Query(
         None, alias="search-language", description="Language of the search. Default to request language or 'en'"
