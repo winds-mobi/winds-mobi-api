@@ -1,0 +1,15 @@
+services:
+  opentelemetry-collector:
+    image: otel/opentelemetry-collector-contrib:0.81.0
+    ports:
+      - "8002:4317"
+    volumes:
+      - ./opentelemetry/collector.yaml:/config.yaml
+    environment:
+      ENVIRONMENT: local
+      SENTRY_URL: ${SENTRY_URL}
+      UPTRACE_URL: ${UPTRACE_URL}
+    command: "--config /config.yaml"
+networks:
+  default:
+    name: winds-mobi
