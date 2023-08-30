@@ -24,9 +24,9 @@ Create an `.env` file from `.env.template` read by docker compose:
 
 Then start the api:
 - `docker compose up --build`
-- stations list api endpoint: http://localhost:8001/stations/
+- OpenAPI client: http://localhost:8001/doc
 
-## Run the project locally on macOS
+## Run the project locally
 ### Dependencies
 - Python 3.11
 - [Poetry](https://python-poetry.org)
@@ -34,15 +34,15 @@ Then start the api:
 Create an `.env.localhost` file from `.env.localhost.template` read by `dotenv` for our local commands:
 - `cp .env.localhost.template .env.localhost`
 
-### Create the python virtual environment and install dependencies
+### Create python virtual environment and install dependencies
 - `poetry install`
 
-### Activate the python virtual environment
+### Activate python virtual environment
 - `poetry shell`
 
 ### Run the server
-- `dotenv -f .env.localhost run uvicorn --proxy-headers --root-path /api/2.3 --port 8001 winds_mobi_api.main:app`
-- stations list api endpoint: http://localhost:8001/stations/
+- `dotenv -f .env.localhost run uvicorn --proxy-headers --root-path "${ROOT_PATH}" --port 8001 winds_mobi_api.main:app`
+- OpenAPI client: http://localhost:8001/doc
 
 ## Licensing
 winds.mobi is licensed under the AGPL License, Version 3.0. See [LICENSE.txt](LICENSE.txt)
