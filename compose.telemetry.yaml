@@ -6,9 +6,9 @@ services:
     volumes:
       - ./opentelemetry/collector.yaml:/config.yaml
     environment:
-      ENVIRONMENT: local
-      SENTRY_URL: ${SENTRY_URL}
-      UPTRACE_URL: ${UPTRACE_URL}
+      - ENVIRONMENT=local
+      - SENTRY_URL
+      - UPTRACE_URL
     command: "--config /config.yaml"
 networks:
   default:

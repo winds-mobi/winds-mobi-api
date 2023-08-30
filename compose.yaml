@@ -5,11 +5,12 @@ services:
     ports:
       - "8001:8000"
     environment:
-      PORT: 8000
-      MONGODB_URL: ${MONGODB_URL}
-      OPENAPI_PREFIX: ${OPENAPI_PREFIX}
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://opentelemetry-collector:4317
-      OTEL_SERVICE_NAME: winds-mobi-api
+      - PORT=8000
+      - MONGODB_URL
+      - ROOT_PATH
+      - OPENAPI_PREFIX
+      - OTEL_EXPORTER_OTLP_ENDPOINT
+      - OTEL_SERVICE_NAME
 networks:
   default:
     name: winds-mobi
