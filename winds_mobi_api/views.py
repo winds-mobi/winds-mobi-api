@@ -128,6 +128,11 @@ async def find_stations(
         description="Return only the stations with a measure more recent that {last-measure}. "
         "Can be a duration in seconds or a absolute datetime, for example: 2019-08-16 15:30",
     ),
+    is_highest_duplicates_rating: bool = Query(
+        False,
+        alias="is-highest-duplicates-rating",
+        description="Return only stations with the highest duplicates rating (filter stations at the same place)",
+    ),
     ids: List[str] = Query(None, description="Returns stations by ids"),
     accept_language: str = Header(None),
 ):
@@ -183,6 +188,11 @@ async def find_stations(
             timestamp = last_measure.timestamp()
         if timestamp:
             query["last._id"] = {"$gte": int(timestamp)}
+
+    if is_highest_duplicates_rating:
+        # Return stations with "duplicates.is_highest_rating" that exists and is True
+        # https://www.mongodb.com/docs/v4.4/tutorial/query-for-null-fields/#non-equality-filter
+        query["duplicates.is_highest_rating"] = {"$ne": False}
 
     if near_latitude and near_longitude:
         if near_distance:
