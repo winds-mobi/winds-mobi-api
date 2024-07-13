@@ -1,10 +1,12 @@
-from pydantic import BaseSettings
+from typing import Optional
+
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     port: int = 8000
     environment: str = "local"
-    sentry_dsn: str = None
+    sentry_dsn: Optional[str] = None
     mongodb_url: str
     openapi_prefix: str = ""
     doc_path: str = "doc"
