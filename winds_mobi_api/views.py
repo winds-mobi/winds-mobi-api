@@ -235,7 +235,7 @@ async def find_stations(
             return {**query, "clusters": {"$elemMatch": {"$lte": int(cluster)}}}
 
         def count(x):
-            y = database.mongodb_sync().stations.count_documents(get_cluster_query(x))
+            y = len(list(database.mongodb_sync().stations.find(get_cluster_query(x), {"_id": 1})))
             return y - limit
 
         def no_cluster_task():
