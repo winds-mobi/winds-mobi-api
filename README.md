@@ -7,9 +7,9 @@ winds-mobi-api
 Python standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb.
 
 Deployed API versions:
-- [winds.mobi/api/2.3/](https://winds.mobi/api/2.3/doc)
-- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/doc)
-- [winds.mobi/api/2/](https://winds.mobi/api/2/doc) -> 2.2
+- [winds.mobi/api/2/](https://winds.mobi/api/2/) -> rewrite to latest version of 2.x
+- [winds.mobi/api/2.3/](https://winds.mobi/api/2.3/)
+- [winds.mobi/api/2.2/](https://winds.mobi/api/2.2/) -> deprecated, permanent redirect to 2.3
 
 OpenAPI documentation:
 - /doc
