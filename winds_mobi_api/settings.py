@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     environment: str = "local"
     sentry_dsn: Optional[str] = None
     mongodb_url: str
-    openapi_prefix: str = ""
+    root_path: str = ""
     doc_path: str = "doc"
     response_schema_validation: bool = False
 

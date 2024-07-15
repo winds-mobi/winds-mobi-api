@@ -14,6 +14,7 @@ from motor import motor_asyncio
 from pymongo import MongoClient
 from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse
 
 from winds_mobi_api import database, views
@@ -43,7 +44,7 @@ app = FastAPI(
     title="winds.mobi",
     version="2.3",
     lifespan=lifespan,
-    openapi_prefix=settings.openapi_prefix,
+    root_path=settings.root_path,
     docs_url=f"/{settings.doc_path}",
     description="""### Feel free to "fair use" this API
 Winds.mobi is a free, community [open source](https://github.com/winds-mobi) project. The data indexed by winds.mobi 
@@ -74,15 +75,15 @@ app.add_middleware(SentryMiddleware)
 
 
 @app.exception_handler(pymongo.errors.OperationFailure)
-async def mongodb_client_exception(request, e):
-    log.warning(f"Mongodb failure: {e.details['errmsg']}")
-    return JSONResponse({"detail": e.details["errmsg"]}, status_code=400)
+async def mongodb_client_exception(request: Request, exc: pymongo.errors.OperationFailure):
+    log.warning(f"Mongodb failure during request '{request.url}': {exc.details['errmsg']}")
+    return JSONResponse({"detail": exc.details["errmsg"]}, status_code=400)
 
 
 @app.exception_handler(pymongo.errors.PyMongoError)
 @app.exception_handler(bson.errors.BSONError)
-async def mongodb_server_exception(request, e):
-    log.error("Mongodb error", exc_info=e)
+async def mongodb_server_exception(request: Request, exc: Exception):
+    log.error(f"Mongodb error during request '{request.url}'", exc_info=exc)
     return JSONResponse({"detail": "Mongodb error"}, status_code=500)
 
 
