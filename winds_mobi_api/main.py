@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from contextlib import asynccontextmanager
 from logging.config import dictConfig
 
 import bson
@@ -9,14 +8,12 @@ import sentry_sdk
 import uvloop
 import yaml
 from fastapi import FastAPI
-from motor import motor_asyncio
-from pymongo import MongoClient
 from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse
 
-from winds_mobi_api import database, views
+from winds_mobi_api import views
 from winds_mobi_api.settings import settings
 
 with open(settings.log_config_path, "r") as file:
@@ -27,20 +24,9 @@ log = logging.getLogger(__name__)
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-
-@asynccontextmanager
-async def lifespan(fastapi: FastAPI):
-    database._mongodb = motor_asyncio.AsyncIOMotorClient(settings.mongodb_url).get_database()
-    database._mongodb_sync = MongoClient(settings.mongodb_url).get_database()
-    yield
-    database.mongodb().client.close()
-    database.mongodb_sync().client.close()
-
-
 app = FastAPI(
     title="winds.mobi",
     version="2.3",
-    lifespan=lifespan,
     root_path=settings.root_path,
     docs_url=f"/{settings.doc_path}",
     description="""### Feel free to "fair use" this API
