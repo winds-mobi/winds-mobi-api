@@ -1,16 +1,19 @@
 import logging
 from datetime import datetime
-from typing import List, Union
+from typing import Annotated, List, Union
 
 import pymongo
 from aiocache import cached
-from fastapi import APIRouter, Header, HTTPException, Path, Query
+from fastapi import APIRouter, Depends, Header, HTTPException, Path, Query
 from fastapi.responses import ORJSONResponse
+from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo.database import Database
 from scipy import optimize
 from starlette.concurrency import run_in_threadpool
 from stop_words import StopWordError, get_stop_words
 
-from winds_mobi_api import database, diacritics
+from winds_mobi_api import diacritics
+from winds_mobi_api.database import mongodb, mongodb_sync
 from winds_mobi_api.language import negotiate_language
 from winds_mobi_api.models import (
     Measure,
@@ -29,13 +32,13 @@ router = APIRouter()
 
 
 @cached(ttl=10 * 60)
-async def get_collection_names(**cache_kwargs):
-    return await database.mongodb().list_collection_names()
+async def get_collection_names(mongodb):
+    return await mongodb.list_collection_names()
 
 
 @cached(ttl=10 * 60)
-async def get_save_clusters():
-    return await database.mongodb().stations_clusters.find_one("save_clusters")
+async def get_save_clusters(mongodb):
+    return await mongodb.stations_clusters.find_one("save_clusters")
 
 
 def response(data):
@@ -61,6 +64,7 @@ Example:
     responses={404: {"description": "Station not found", "content": {**error_detail_doc}}},
 )
 async def get_station(
+    mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
     station_id: str = Path(..., description="The station ID to request"),
     keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
 ):
@@ -70,7 +74,7 @@ async def get_station(
     # last._id should be always returned
     projection_dict["last._id"] = 1
 
-    station = await database.mongodb().stations.find_one({"_id": station_id}, projection_dict)
+    station = await mongodb.stations.find_one({"_id": station_id}, projection_dict)
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
     return response(station)
@@ -97,6 +101,8 @@ Examples:
     },
 )
 async def find_stations(
+    mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
+    mongodb_sync: Annotated[Database, Depends(mongodb_sync)],
     request_limit: int = Query(20, alias="limit", description="Nb stations to return (max=500)"),
     keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
     provider: str = Query(None, description="Returns only stations of the given provider id. Limit is not enforced"),
@@ -210,7 +216,7 @@ async def find_stations(
         else:
             query["loc"] = {"$near": {"$geometry": {"type": "Point", "coordinates": [near_longitude, near_latitude]}}}
         # $near results are already sorted: return now
-        cursor = database.mongodb().stations.find(query, projection_dict).limit(limit)
+        cursor = mongodb.stations.find(query, projection_dict).limit(limit)
         return response(await cursor.to_list(None))
 
     if (
@@ -236,14 +242,14 @@ async def find_stations(
 
         def no_cluster_task(min, max) -> float:
             return optimize.brentq(
-                lambda x: database.mongodb_sync().stations.count_documents((get_cluster_query(int(x)))) - limit,
+                lambda x: mongodb_sync.stations.count_documents((get_cluster_query(int(x)))) - limit,
                 min,
                 max,
                 maxiter=2,
                 disp=False,
             )
 
-        save_cluster = await get_save_clusters()
+        save_cluster = await get_save_clusters(mongodb)
         try:
             # CPU and IO bound task using a sync library: executing it in a separated thread to not block the event loop
             no_cluster = int(await run_in_threadpool(no_cluster_task, min=save_cluster["min"], max=save_cluster["max"]))
@@ -251,21 +257,21 @@ async def find_stations(
             no_cluster = None
 
         if no_cluster:
-            cursor = database.mongodb().stations.find(get_cluster_query(no_cluster), projection_dict)
+            cursor = mongodb.stations.find(get_cluster_query(no_cluster), projection_dict)
         else:
-            cursor = database.mongodb().stations.find(query, projection_dict)
+            cursor = mongodb.stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
         log.debug(f"no_cluster={no_cluster}, limit={limit} => {len(stations)}")
         return response(stations)
 
     if ids:
         query["_id"] = {"$in": ids}
-        cursor = database.mongodb().stations.find(query, projection_dict)
+        cursor = mongodb.stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
         stations.sort(key=lambda station: ids.index(station["_id"]))
         return response(stations)
 
-    cursor = database.mongodb().stations.find(query, projection_dict).sort("short", pymongo.ASCENDING)
+    cursor = mongodb.stations.find(query, projection_dict).sort("short", pymongo.ASCENDING)
     if use_limit:
         cursor.limit(limit)
     elif request_limit >= 1:
@@ -290,6 +296,7 @@ Example:
     },
 )
 async def get_station_historic(
+    mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
     station_id: str = Path(..., description="The station ID to request"),
     duration: int = Query(3600, description="Historic duration"),
     keys: List[MeasureKey] = Query(measure_key_defaults, description="List of keys to return"),
@@ -301,13 +308,15 @@ async def get_station_historic(
     if duration > 7 * 24 * 3600:
         raise HTTPException(status_code=400, detail="Duration > 7 days")
 
-    station = await database.mongodb().stations.find_one({"_id": station_id})
+    station = await mongodb.stations.find_one({"_id": station_id})
     if not station:
         raise HTTPException(status_code=404, detail=f"No station with id '{station_id}'")
 
-    if "last" not in station or station_id not in await get_collection_names(aiocache_wait_for_write=False):
+    if "last" not in station or station_id not in await get_collection_names(
+        mongodb=mongodb, aiocache_wait_for_write=False
+    ):
         raise HTTPException(status_code=404, detail=f"No historic data for station id '{station_id}'")
     last_time = station["last"]["_id"]
     start_time = last_time - duration
-    cursor = database.mongodb()[station_id].find({"_id": {"$gte": start_time}}, projection_dict, sort=(("_id", -1),))
+    cursor = mongodb[station_id].find({"_id": {"$gte": start_time}}, projection_dict, sort=(("_id", -1),))
     return response(await cursor.to_list(None))
