@@ -2,18 +2,17 @@ import logging
 from datetime import datetime
 from typing import Annotated, List, Union
 
+import numpy as np
 import pymongo
 from aiocache import cached
 from fastapi import APIRouter, Depends, Header, HTTPException, Path, Query
 from fastapi.responses import ORJSONResponse
 from motor.motor_asyncio import AsyncIOMotorDatabase
-from pymongo.database import Database
-from scipy import optimize
-from starlette.concurrency import run_in_threadpool
+from scipy.stats import linregress
 from stop_words import StopWordError, get_stop_words
 
 from winds_mobi_api import diacritics
-from winds_mobi_api.database import mongodb, mongodb_sync
+from winds_mobi_api.database import mongodb
 from winds_mobi_api.language import negotiate_language
 from winds_mobi_api.models import (
     Measure,
@@ -102,7 +101,6 @@ Examples:
 )
 async def find_stations(
     mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
-    mongodb_sync: Annotated[Database, Depends(mongodb_sync)],
     request_limit: int = Query(20, alias="limit", description="Nb stations to return (max=500)"),
     keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
     provider: str = Query(None, description="Returns only stations of the given provider id. Limit is not enforced"),
@@ -240,28 +238,25 @@ async def find_stations(
         def get_cluster_query(cluster: int):
             return {**query, "clusters": {"$elemMatch": {"$lte": cluster}}}
 
-        def no_cluster_task(min, max) -> float:
-            return optimize.brentq(
-                lambda x: mongodb_sync.stations.count_documents((get_cluster_query(int(x)))) - limit,
-                min,
-                max,
-                maxiter=2,
-                disp=False,
-            )
-
         save_cluster = await get_save_clusters(mongodb)
-        try:
-            # CPU and IO bound task using a sync library: executing it in a separated thread to not block the event loop
-            no_cluster = int(await run_in_threadpool(no_cluster_task, min=save_cluster["min"], max=save_cluster["max"]))
-        except ValueError:
-            no_cluster = None
+        cluster_min = save_cluster["min"]
+        cluster_max = save_cluster["max"]
+        x = [x for x in np.linspace(cluster_min, cluster_max, 3)]
+        y = [await mongodb.stations.count_documents(get_cluster_query(int(cluster))) for cluster in x]
+        result = linregress(x, y)
+        cluster_value = (limit - result.intercept) / result.slope
+        cluster_value = max(cluster_value, cluster_min)
+        if cluster_value <= cluster_max:
+            cluster = int(cluster_value)
+        else:
+            cluster = None
 
-        if no_cluster:
-            cursor = mongodb.stations.find(get_cluster_query(no_cluster), projection_dict)
+        if cluster:
+            cursor = mongodb.stations.find(get_cluster_query(cluster), projection_dict)
         else:
             cursor = mongodb.stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
-        log.debug(f"no_cluster={no_cluster}, limit={limit} => {len(stations)}")
+        log.debug(f"Result with limit={limit}: cluster {cluster} with {len(stations)} stations")
         return response(stations)
 
     if ids:
