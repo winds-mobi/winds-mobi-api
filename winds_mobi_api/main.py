@@ -2,7 +2,6 @@ import asyncio
 import logging
 from contextlib import asynccontextmanager
 from logging.config import dictConfig
-from pathlib import Path
 
 import bson
 import pymongo
@@ -20,9 +19,7 @@ from starlette.responses import JSONResponse, RedirectResponse
 from winds_mobi_api import database, views
 from winds_mobi_api.settings import settings
 
-HERE = Path(__file__).parents[0]
-
-with open(Path(HERE, "logging.yaml"), "r") as file:
+with open(settings.log_config_path, "r") as file:
     dictConfig(yaml.load(file, Loader=yaml.FullLoader))
 sentry_sdk.init(settings.sentry_dsn, environment=settings.environment)
 
