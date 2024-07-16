@@ -1,5 +1,5 @@
 version: 1
-disable_existing_loggers: True
+disable_existing_loggers: False
 formatters:
   console:
     format: "%(asctime)s %(levelname)s [%(name)s] | %(message)s"
@@ -11,6 +11,10 @@ handlers:
     stream: ext://sys.stdout
 loggers:
   uvicorn.error:
+    level: INFO
+  uvicorn.access:
+    level: WARNING
+  winds_mobi_api:
     level: INFO
 root:
   handlers: [ console ]
