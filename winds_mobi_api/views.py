@@ -47,6 +47,17 @@ def response(data):
         return ORJSONResponse(data, 200)
 
 
+def check_latitude_longitude(latitude: float, longitude: float):
+    if not -90 <= latitude <= 90:
+        message = f"latitude is out of bounds (>=-90,<=90), latitude: {latitude}"
+        log.warning(message)
+        raise HTTPException(status_code=400, detail=message)
+    if not -180 <= longitude <= 180:
+        message = f"latitude is out of bounds (>=-90,<=90), latitude: {latitude}"
+        log.warning(message)
+        raise HTTPException(status_code=400, detail=message)
+
+
 error_detail_doc = {"application/json": {"schema": {"type": "object", "properties": {"detail": {"type": "string"}}}}}
 
 
@@ -204,6 +215,7 @@ async def find_stations(
         query["duplicates.is_highest_rating"] = {"$ne": False}
 
     if near_latitude and near_longitude:
+        check_latitude_longitude(near_latitude, near_longitude)
         if near_distance:
             query["loc"] = {
                 "$near": {
@@ -223,6 +235,8 @@ async def find_stations(
         and within_pt2_latitude is not None
         and within_pt2_longitude is not None
     ):
+        check_latitude_longitude(within_pt1_latitude, within_pt1_longitude)
+        check_latitude_longitude(within_pt2_latitude, within_pt2_longitude)
         if within_pt1_latitude == within_pt2_latitude and within_pt1_longitude == within_pt2_longitude:
             # Empty box
             return response([])
@@ -256,7 +270,6 @@ async def find_stations(
         else:
             cursor = mongodb.stations.find(query, projection_dict)
         stations = await cursor.to_list(None)
-        log.debug(f"Result with limit={limit}: cluster {cluster} with {len(stations)} stations")
         return response(stations)
 
     if ids:
