@@ -14,18 +14,17 @@ python = "3.11.9"
 aiocache = "0.12.2"
 fastapi = "0.111.0"
 motor = "3.5.1"
-opentelemetry-distro = {extras = ["otlp"], version = "0.46b0"}
-opentelemetry-instrumentation = "0.46b0"
-opentelemetry-instrumentation-fastapi = "0.46b0"
-opentelemetry-instrumentation-pymongo = "0.46b0"
+opentelemetry-distro = {extras = ["otlp"], version = "0.51b0"}
+opentelemetry-instrumentation = "0.51b0"
+opentelemetry-instrumentation-fastapi = "0.51b0"
+opentelemetry-instrumentation-pymongo = "0.51b0"
 orjson = "3.10.6"
 parse-accept-language = "0.1.2"
 pyaml = "24.4.0"
 pydantic = "2.8.2"
 pydantic-settings = "2.3.4"
 scipy = "1.14.0"
-sentry-asgi = "0.2.0"
-sentry-sdk = "2.9.0"
+sentry-sdk = {extras = ["fastapi"], version = "2.22.0"}
 stop-words = "2018.7.23"
 ujson = "5.10.0" # Optional dependency used by aiocache
 

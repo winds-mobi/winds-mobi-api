@@ -1,0 +1,31 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+
+processors:
+  attributes/environment:
+    actions:
+      # https://opentelemetry.io/docs/specs/semconv/resource/deployment-environment/
+      - key: deployment.environment.name
+        action: insert
+        value: ${ENVIRONMENT}
+  batch:
+    send_batch_size: 10000
+    timeout: 10s
+
+exporters:
+  sentry:
+    dsn: ${SENTRY_URL}
+    environment: ${ENVIRONMENT}
+    insecure_skip_verify: true
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    traces/sentry:
+      receivers: [ otlp ]
+      processors: [ attributes/environment, batch ]
+      exporters: [ debug, sentry ]
