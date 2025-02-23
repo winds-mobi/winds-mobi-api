@@ -8,7 +8,6 @@ services:
       - PORT=8000
       - MONGODB_URL
       - ROOT_PATH
-      - OPENAPI_PREFIX
       - OTEL_EXPORTER_OTLP_ENDPOINT
       - OTEL_SERVICE_NAME
 networks:

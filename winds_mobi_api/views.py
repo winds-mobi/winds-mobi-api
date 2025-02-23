@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime
 from typing import List, Union
@@ -8,6 +7,7 @@ from aiocache import cached
 from fastapi import APIRouter, Header, HTTPException, Path, Query
 from fastapi.responses import ORJSONResponse
 from scipy import optimize
+from starlette.concurrency import run_in_threadpool
 from stop_words import StopWordError, get_stop_words
 
 from winds_mobi_api import database, diacritics
@@ -31,6 +31,11 @@ router = APIRouter()
 @cached(ttl=10 * 60)
 async def get_collection_names(**cache_kwargs):
     return await database.mongodb().list_collection_names()
+
+
+@cached(ttl=10 * 60)
+async def get_save_clusters():
+    return await database.mongodb().stations_clusters.find_one("save_clusters")
 
 
 def response(data):
@@ -129,7 +134,7 @@ async def find_stations(
         "Can be a duration in seconds or a absolute datetime, for example: 2019-08-16 15:30",
     ),
     is_highest_duplicates_rating: bool = Query(
-        False,
+        None,
         alias="is-highest-duplicates-rating",
         description="Return only stations with the highest duplicates rating (filter stations at the same place)",
     ),
@@ -183,7 +188,7 @@ async def find_stations(
     if last_measure is not None:
         timestamp = None
         if isinstance(last_measure, int):
-            timestamp = datetime.now().timestamp() - last_measure
+            timestamp = now - last_measure
         elif isinstance(last_measure, datetime):
             timestamp = last_measure.timestamp()
         if timestamp:
@@ -226,35 +231,31 @@ async def find_stations(
             }
         }
 
-        now = datetime.now().timestamp()
-        nb_stations = await database.mongodb().stations.count_documents(
-            {"status": {"$ne": "hidden"}, "last._id": {"$gt": now - 30 * 24 * 3600}}
-        )
+        def get_cluster_query(cluster: int):
+            return {**query, "clusters": {"$elemMatch": {"$lte": cluster}}}
 
-        def get_cluster_query(cluster):
-            return {**query, "clusters": {"$elemMatch": {"$lte": int(cluster)}}}
+        def no_cluster_task(min, max) -> float:
+            return optimize.brentq(
+                lambda x: database.mongodb_sync().stations.count_documents((get_cluster_query(int(x)))) - limit,
+                min,
+                max,
+                maxiter=2,
+                disp=False,
+            )
 
-        def count(x):
-            y = len(list(database.mongodb_sync().stations.find(get_cluster_query(x), {"_id": 1})))
-            return y - limit
-
-        def no_cluster_task():
-            return optimize.brentq(count, 1, nb_stations, maxiter=2, disp=False)
-
+        save_cluster = await get_save_clusters()
         try:
             # CPU and IO bound task using a sync library: executing it in a separated thread to not block the event loop
-            no_cluster = await asyncio.get_running_loop().run_in_executor(None, no_cluster_task)
+            no_cluster = int(await run_in_threadpool(no_cluster_task, min=save_cluster["min"], max=save_cluster["max"]))
         except ValueError:
             no_cluster = None
 
         if no_cluster:
             cursor = database.mongodb().stations.find(get_cluster_query(no_cluster), projection_dict)
-            stations = await cursor.to_list(None)
-            log.debug(f"limit={limit}, no_cluster={no_cluster:.0f} => {len(stations)}")
         else:
             cursor = database.mongodb().stations.find(query, projection_dict)
-            stations = await cursor.to_list(None)
-            log.debug(f"limit={limit} => {len(stations)}")
+        stations = await cursor.to_list(None)
+        log.debug(f"no_cluster={no_cluster}, limit={limit} => {len(stations)}")
         return response(stations)
 
     if ids:

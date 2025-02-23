@@ -1,8 +1,9 @@
 import asyncio
 import logging
+from contextlib import asynccontextmanager
 from logging.config import dictConfig
-from pathlib import Path
 
+import bson
 import pymongo
 import sentry_sdk
 import uvloop
@@ -12,14 +13,13 @@ from motor import motor_asyncio
 from pymongo import MongoClient
 from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
+from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse
 
 from winds_mobi_api import database, views
 from winds_mobi_api.settings import settings
 
-HERE = Path(__file__).parents[0]
-
-with open(Path(HERE, "logging.yaml"), "r") as file:
+with open(settings.log_config_path, "r") as file:
     dictConfig(yaml.load(file, Loader=yaml.FullLoader))
 sentry_sdk.init(settings.sentry_dsn, environment=settings.environment)
 
@@ -27,10 +27,21 @@ log = logging.getLogger(__name__)
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
+
+@asynccontextmanager
+async def lifespan(fastapi: FastAPI):
+    database._mongodb = motor_asyncio.AsyncIOMotorClient(settings.mongodb_url).get_database()
+    database._mongodb_sync = MongoClient(settings.mongodb_url).get_database()
+    yield
+    database.mongodb().client.close()
+    database.mongodb_sync().client.close()
+
+
 app = FastAPI(
     title="winds.mobi",
     version="2.3",
-    openapi_prefix=settings.openapi_prefix,
+    lifespan=lifespan,
+    root_path=settings.root_path,
     docs_url=f"/{settings.doc_path}",
     description="""### Feel free to "fair use" this API
 Winds.mobi is a free, community [open source](https://github.com/winds-mobi) project. The data indexed by winds.mobi 
@@ -60,16 +71,17 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"])
 app.add_middleware(SentryMiddleware)
 
 
-@app.on_event("startup")
-async def startup_event():
-    database._mongodb = motor_asyncio.AsyncIOMotorClient(settings.mongodb_url).get_database()
-    database._mongodb_sync = MongoClient(settings.mongodb_url).get_database()
-
-
 @app.exception_handler(pymongo.errors.OperationFailure)
-async def mongo_exception(request, exc):
-    log.error("Mongodb error", exc_info=exc)
-    return JSONResponse({"detail": "Mongodb error"}, status_code=400)
+async def mongodb_client_exception(request: Request, exc: pymongo.errors.OperationFailure):
+    log.warning(f"Mongodb failure during request '{request.url}': {exc.details['errmsg']}")
+    return JSONResponse({"detail": exc.details["errmsg"]}, status_code=400)
+
+
+@app.exception_handler(pymongo.errors.PyMongoError)
+@app.exception_handler(bson.errors.BSONError)
+async def mongodb_server_exception(request: Request, exc: Exception):
+    log.error(f"Mongodb error during request '{request.url}'", exc_info=exc)
+    return JSONResponse({"detail": "Mongodb error"}, status_code=500)
 
 
 @app.get("/", include_in_schema=False)
