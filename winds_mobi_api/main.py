@@ -8,7 +8,6 @@ import sentry_sdk
 import uvloop
 import yaml
 from fastapi import FastAPI
-from sentry_asgi import SentryMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse, RedirectResponse
@@ -18,7 +17,7 @@ from winds_mobi_api.settings import settings
 
 with open(settings.log_config_path, "r") as file:
     dictConfig(yaml.load(file, Loader=yaml.FullLoader))
-sentry_sdk.init(settings.sentry_dsn, environment=settings.environment)
+sentry_sdk.init(settings.sentry_url, environment=settings.environment)
 
 log = logging.getLogger(__name__)
 
@@ -54,7 +53,6 @@ info@winds.mobi
 """,  # noqa: W291
 )
 app.add_middleware(CORSMiddleware, allow_origins=["*"])
-app.add_middleware(SentryMiddleware)
 
 
 @app.exception_handler(pymongo.errors.OperationFailure)

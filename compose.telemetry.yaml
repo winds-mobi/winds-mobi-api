@@ -1,10 +1,10 @@
 services:
   opentelemetry-collector:
-    image: otel/opentelemetry-collector-contrib:0.104.0
+    image: otel/opentelemetry-collector-contrib:0.120.0
     ports:
       - "8002:4317"
     volumes:
-      - ./opentelemetry/collector.yaml:/config.yaml
+      - ./config/local/opentelemetry-collector.yaml:/config.yaml
     environment:
       - ENVIRONMENT=local
       - SENTRY_URL

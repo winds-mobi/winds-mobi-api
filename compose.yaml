@@ -9,7 +9,6 @@ services:
       - MONGODB_URL
       - ROOT_PATH
       - OTEL_EXPORTER_OTLP_ENDPOINT
-      - OTEL_SERVICE_NAME
 networks:
   default:
     name: winds-mobi

@@ -41,7 +41,9 @@ Create an `.env.localhost` file from `.env.localhost.template` read by `dotenv` 
 - `poetry shell`
 
 ### Run the server
-- `dotenv -f .env.localhost run uvicorn --proxy-headers --root-path "${ROOT_PATH}" --port 8001 winds_mobi_api.main:app`
+- `dotenv -f .env.localhost run uvicorn --log-config=./config/local/logging.yaml --proxy-headers --root-path="$ROOT_PATH" --port 8001 winds_mobi_api.main:app`
+or with opentelemetry instrumentation:
+- `dotenv -f .env.localhost run opentelemetry-instrument --service_name=winds-mobi-api --metrics_exporter=none uvicorn --log-config=./config/local/logging.yaml --proxy-headers --root-path="$ROOT_PATH" --port 8001 winds_mobi_api.main:app`
 - OpenAPI client: http://localhost:8001/doc
 
 ## Licensing
