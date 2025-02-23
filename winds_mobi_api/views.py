@@ -53,7 +53,7 @@ def check_latitude_longitude(latitude: float, longitude: float):
         log.warning(message)
         raise HTTPException(status_code=400, detail=message)
     if not -180 <= longitude <= 180:
-        message = f"latitude is out of bounds (>=-90,<=90), latitude: {latitude}"
+        message = f"longitude is out of bounds (>=-180,<=180), longitude: {longitude}"
         log.warning(message)
         raise HTTPException(status_code=400, detail=message)
 
