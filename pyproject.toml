@@ -12,7 +12,7 @@ packages = [
 python = "3.11.9"
 
 aiocache = "0.12.3"
-fastapi = {extras = ["standard"], version = "0.115.8"}
+fastapi = {extras = ["standard"], version = "0.115.11"}
 motor = "3.7.0"
 opentelemetry-distro = {extras = ["otlp"], version = "0.51b0"}
 opentelemetry-instrumentation = "0.51b0"
