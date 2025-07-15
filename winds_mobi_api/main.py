@@ -29,26 +29,23 @@ app = FastAPI(
     root_path=settings.root_path,
     docs_url=f"/{settings.doc_path}",
     description="""### Feel free to "fair use" this API
-Winds.mobi is a free, community [open source](https://github.com/winds-mobi) project. The data indexed by winds.mobi 
-are kindly shared by their providers and belong to them.
+Winds.mobi is a free, community-driven, [open source](https://github.com/winds-mobi) project. The data indexed by 
+winds.mobi are kindly shared by their providers and belong to them.
 
-1. Don't try to monetize your service that is using winds.mobi data in any way: paid application, subscription, 
+Terms of Use:
+1. Always identify your calls to winds.mobi API by setting a **user-agent HTTP header** containing a string that 
+identifies you, for example, `user-agent: my-service.cloud`.
+
+2. **Do not monetize** your service using winds.mobi data in any way: paid application, subscription, 
 in-app purchase, advertisement, ...
 
-2. Don't overload this server by minimizing your number of calls:
-- get data for multiple stations at once
-- use cache in your backend application
+3. **Do not overload** this server by minimizing your number of calls. Get data for multiple stations at once.
 
-3. Always publicly identify your calls to winds.mobi by doing at least one of the following:
-- use an IP address with a `reverse DNS` (PTR record) to identify your backend application
-- set an HTTP header `user-agent` to identify your backend application
-- set an HTTP header `referer` (most browsers are doing it by default) to identify your web application
-
-Any IP or application that doesn't respect these rules could be blacklisted without any notice.
+Any IP or service that doesn't respect these rules will be blacklisted without any notice.
 
 Enjoy!
 
-Yann
+Yann  
 info@winds.mobi
 """,  # noqa: W291
 )

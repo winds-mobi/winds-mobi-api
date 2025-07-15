@@ -12,28 +12,28 @@ packages = [
 python = "3.11.9"
 
 aiocache = "0.12.3"
-fastapi = {extras = ["standard"], version = "0.115.12"}
-motor = "3.7.0"
-opentelemetry-distro = {extras = ["otlp"], version = "0.51b0"}
-opentelemetry-instrumentation = "0.51b0"
-opentelemetry-instrumentation-fastapi = "0.51b0"
-opentelemetry-instrumentation-pymongo = "0.51b0"
-orjson = "3.10.15"
+fastapi = {extras = ["standard"], version = "0.116.1"}
+motor = "3.7.1"
+opentelemetry-distro = {extras = ["otlp"], version = "0.56b0"}
+opentelemetry-instrumentation = "0.56b0"
+opentelemetry-instrumentation-fastapi = "0.56b0"
+opentelemetry-instrumentation-pymongo = "0.56b0"
+orjson = "3.11.0"
 parse-accept-language = "0.1.2"
-pyaml = "25.1.0"
-pydantic = "2.10.6"
-pydantic-settings = "2.8.0"
-scipy = "1.15.2"
-sentry-sdk = {extras = ["fastapi"], version = "2.22.0"}
+pyaml = "25.7.0"
+pydantic = "2.11.7"
+pydantic-settings = "2.10.1"
+scipy = "1.16.0"
+sentry-sdk = {extras = ["fastapi"], version = "2.33.0"}
 stop-words = "2018.7.23"
 ujson = "5.10.0" # Optional dependency used by aiocache
 
 [tool.poetry.group.dev.dependencies]
 black = "25.1.0"
-flake8 = "7.1.2"
-isort = "6.0.0"
+flake8 = "7.3.0"
+isort = "6.0.1"
 locust = "*"
-pytest = "8.3.4"
+pytest = "8.4.1"
 python-dotenv = "*"
 
 [build-system]
