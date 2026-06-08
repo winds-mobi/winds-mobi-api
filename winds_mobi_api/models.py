@@ -1,11 +1,10 @@
+import enum
 from datetime import datetime
-from enum import Enum
-from typing import Dict, List
 
 from pydantic import BaseModel, Field
 
 
-class Status(str, Enum):
+class Status(enum.StrEnum):
     green = "green"
     orange = "orange"
     red = "red"
@@ -13,7 +12,7 @@ class Status(str, Enum):
 
 class Location(BaseModel):
     type: str = Field("Point", title="Type", description="GeoJSON type")
-    coordinates: List[float] = Field(None, title="Coordinates", description="longitude, latitude")
+    coordinates: list[float] = Field(None, title="Coordinates", description="longitude, latitude")
 
 
 class Pressure(BaseModel):
@@ -36,7 +35,7 @@ class Measure(BaseModel):
     pres: Pressure = Field(None, title="Pressure", description="Air pressure")
 
 
-class MeasureKey(str, Enum):
+class MeasureKey(enum.StrEnum):
     id = "_id"
     w_dir = "w-dir"
     w_avg = "w-avg"
@@ -83,7 +82,7 @@ class Station(BaseModel):
     tz: str = Field(None, title="Timezone", description="Timezone, example: Europe/Zurich")
     loc: Location = Field(None, title="Location", description="Location [geoJSON point]")
     last: Measure = Field(None, title="Last measure", description="Last measurement values")
-    url: Dict[str, str] = Field(
+    url: dict[str, str] = Field(
         None,
         title="Provider urls",
         description="""Urls to the provider station per language. Example:
@@ -97,7 +96,7 @@ class Station(BaseModel):
     )
 
 
-class StationKey(str, Enum):
+class StationKey(enum.StrEnum):
     pv_id = "pv-id"
     pv_code = "pv-code"
     pv_name = "pv-name"

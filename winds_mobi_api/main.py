@@ -15,7 +15,7 @@ from starlette.responses import JSONResponse, RedirectResponse
 from winds_mobi_api import views
 from winds_mobi_api.settings import settings
 
-with open(settings.log_config_path, "r") as file:
+with open(settings.log_config_path) as file:
     dictConfig(yaml.load(file, Loader=yaml.FullLoader))
 sentry_sdk.init(settings.sentry_url, environment=settings.environment)
 
