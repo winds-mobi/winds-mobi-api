@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Annotated, List, Union
+from typing import Annotated
 
 import numpy as np
 import pymongo
@@ -76,7 +76,7 @@ Example:
 async def get_station(
     mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
     station_id: str = Path(..., description="The station ID to request"),
-    keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
+    keys: list[StationKey] = Query(station_key_defaults, description="List of keys to return"),
 ):
     projection_dict = {}
     for key in keys:
@@ -93,7 +93,7 @@ async def get_station(
 @router.get(
     "/stations/",
     status_code=200,
-    response_model=List[Station],
+    response_model=list[Station],
     summary="Search for stations",
     response_class=ORJSONResponse,
     description="""
@@ -113,7 +113,7 @@ Examples:
 async def find_stations(
     mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
     request_limit: int = Query(20, alias="limit", description="Nb stations to return (max=500)"),
-    keys: List[StationKey] = Query(station_key_defaults, description="List of keys to return"),
+    keys: list[StationKey] = Query(station_key_defaults, description="List of keys to return"),
     provider: str = Query(None, description="Returns only stations of the given provider id. Limit is not enforced"),
     search: str = Query(None, description="String to search (ignoring accent)"),
     search_language: str = Query(
@@ -142,7 +142,7 @@ async def find_stations(
     status: Status = Query(
         None, description="Return only the stations with the given status: 'green', 'orange' or 'red'"
     ),
-    last_measure: Union[int, datetime] = Query(
+    last_measure: int | datetime = Query(
         None,
         alias="last-measure",
         description="Return only the stations with a measure more recent that {last-measure}. "
@@ -153,13 +153,10 @@ async def find_stations(
         alias="is-highest-duplicates-rating",
         description="Return only stations with the highest duplicates rating (filter stations at the same place)",
     ),
-    ids: List[str] = Query(None, description="Returns stations by ids"),
+    ids: list[str] = Query(None, description="Returns stations by ids"),
     accept_language: str = Header(None),
 ):
-    if 1 <= request_limit <= 500:
-        limit = request_limit
-    else:
-        limit = 500
+    limit = request_limit if 1 <= request_limit <= 500 else 500
     use_limit = True
 
     projection_dict = {}
@@ -260,10 +257,7 @@ async def find_stations(
         result = linregress(x, y)
         cluster_value = (limit - result.intercept) / result.slope
         cluster_value = max(cluster_value, cluster_min)
-        if cluster_value <= cluster_max:
-            cluster = int(cluster_value)
-        else:
-            cluster = None
+        cluster = int(cluster_value) if cluster_value <= cluster_max else None
 
         if cluster:
             cursor = mongodb.stations.find(get_cluster_query(cluster), projection_dict)
@@ -290,7 +284,7 @@ async def find_stations(
 @router.get(
     "/stations/{station_id}/historic/",
     status_code=200,
-    response_model=List[Measure],
+    response_model=list[Measure],
     summary="Get historic data for a station since a duration",
     response_class=ORJSONResponse,
     description="""
@@ -307,7 +301,7 @@ async def get_station_historic(
     mongodb: Annotated[AsyncIOMotorDatabase, Depends(mongodb)],
     station_id: str = Path(..., description="The station ID to request"),
     duration: int = Query(3600, description="Historic duration"),
-    keys: List[MeasureKey] = Query(measure_key_defaults, description="List of keys to return"),
+    keys: list[MeasureKey] = Query(measure_key_defaults, description="List of keys to return"),
 ):
     projection_dict = {}
     for key in keys:

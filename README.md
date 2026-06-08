@@ -28,16 +28,16 @@ Then start the api:
 ## Run the project locally
 ### Dependencies
 - Python 3.11
-- [Poetry](https://python-poetry.org)
+- [uv](https://github.com/astral-sh/uv)
 
 Create an `.env.localhost` file from `.env.localhost.template` read by `dotenv` for our local commands:
 - `cp .env.localhost.template .env.localhost`
 
 ### Create python virtual environment and install dependencies
-- `poetry install`
+- `uv sync`
 
 ### Activate python virtual environment
-- `poetry shell`
+- `source .venv/bin/activate` (or use `uv run <command>`)
 
 ### Run the server
 ```

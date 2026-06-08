@@ -1,48 +1,51 @@
-[tool.poetry]
+[project]
 name = "winds-mobi-api"
-description = "Python standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb."
 version = "0.0.0"
-authors = ["winds.mobi"]
-license = "	AGPL-3.0-only"
-packages = [
-    { include = "winds_mobi_api" },
+description = "Python standalone asyncIO API that provides different endpoints to get weather data from winds.mobi mongodb."
+authors = [
+    { name = "winds.mobi" }
+]
+license = { text = "AGPL-3.0-only" }
+readme = "README.md"
+requires-python = ">=3.11,<3.12"
+dependencies = [
+    "aiocache==0.12.3",
+    "fastapi[standard]==0.136.3",
+    "motor==3.7.1",
+    "opentelemetry-distro[otlp]==0.56b0",
+    "opentelemetry-instrumentation==0.56b0",
+    "opentelemetry-instrumentation-fastapi==0.56b0",
+    "opentelemetry-instrumentation-pymongo==0.56b0",
+    "orjson==3.11.9",
+    "parse-accept-language==0.1.2",
+    "pyaml==25.7.0",
+    "pydantic==2.11.7",
+    "pydantic-settings==2.10.1",
+    "scipy==1.16.0",
+    "sentry-sdk[fastapi]==2.62.0",
+    "stop-words==2018.7.23",
+    "ujson==5.12.1", # Optional dependency used by aiocache
 ]
 
-[tool.poetry.dependencies]
-python = "3.11.9"
+[dependency-groups]
+dev = [
+    "locust",
+    "pytest>=8.4.1",
+    "python-dotenv",
+    "ruff==0.15.16",
+]
 
-aiocache = "0.12.3"
-fastapi = {extras = ["standard"], version = "0.116.1"}
-motor = "3.7.1"
-opentelemetry-distro = {extras = ["otlp"], version = "0.56b0"}
-opentelemetry-instrumentation = "0.56b0"
-opentelemetry-instrumentation-fastapi = "0.56b0"
-opentelemetry-instrumentation-pymongo = "0.56b0"
-orjson = "3.11.0"
-parse-accept-language = "0.1.2"
-pyaml = "25.7.0"
-pydantic = "2.11.7"
-pydantic-settings = "2.10.1"
-scipy = "1.16.0"
-sentry-sdk = {extras = ["fastapi"], version = "2.33.0"}
-stop-words = "2018.7.23"
-ujson = "5.10.0" # Optional dependency used by aiocache
-
-[tool.poetry.group.dev.dependencies]
-black = "25.1.0"
-flake8 = "7.3.0"
-isort = "6.0.1"
-locust = "*"
-pytest = "8.4.1"
-python-dotenv = "*"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.black]
+[tool.ruff]
 line-length = 120
 
-[tool.isort]
-profile = "black"
-line_length = 120
+[tool.ruff.lint]
+select = [
+    "E", "W",
+    "F",
+    "SIM",
+    "B",
+    "UP",
+    "I",
+]
+ignore = ["B008"]
+
