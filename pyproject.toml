@@ -19,7 +19,7 @@ dependencies = [
     "orjson==3.11.9",
     "parse-accept-language==0.1.2",
     "pyaml==25.7.0",
-    "pydantic==2.11.7",
+    "pydantic==2.13.4",
     "pydantic-settings==2.10.1",
     "scipy==1.16.0",
     "sentry-sdk[fastapi]==2.62.0",
