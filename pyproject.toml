@@ -24,7 +24,7 @@ dependencies = [
     "scipy==1.16.0",
     "sentry-sdk[fastapi]==2.62.0",
     "stop-words==2018.7.23",
-    "ujson==5.12.1", # Optional dependency used by aiocache
+    "ujson==5.13.0", # Optional dependency used by aiocache
 ]
 
 [dependency-groups]
