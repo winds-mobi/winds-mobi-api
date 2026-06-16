@@ -32,7 +32,7 @@ dev = [
     "locust",
     "pytest>=8.4.1",
     "python-dotenv",
-    "ruff==0.15.16",
+    "ruff==0.15.17",
 ]
 
 [tool.ruff]
